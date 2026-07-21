@@ -6,20 +6,25 @@
    ========================================================================== */
 
 :root {
+  /* Brand palette (matches ClientComponent.css): black #140102,
+     red #d10012, white #ffffff, light gray #eeeeee. Success/error keep
+     their conventional green/red so status meaning stays unambiguous,
+     but the error tone is pulled from the same red family as the brand. */
   --cf-bg: #ffffff;
-  --cf-surface: #f7f8fa;
+  --cf-surface: #eeeeee;
   --cf-border: #d7dbe0;
-  --cf-border-focus: #3a6df0;
-  --cf-text: #1c1f26;
+  --cf-border-focus: #d10012;
+  --cf-text: #140102;
   --cf-text-muted: #6b7280;
-  --cf-accent: #3a6df0;
-  --cf-accent-hover: #2c56c9;
-  --cf-error: #d64545;
+  --cf-accent: #d10012;
+  --cf-accent-hover: #b91c1c;
+  --cf-error: #b91c1c;
   --cf-error-bg: #fdeceb;
   --cf-success: #1e7e45;
   --cf-success-bg: #e9f8ee;
-  --cf-radius: 10px;
-  --cf-shadow: 0 8px 24px rgba(20, 24, 33, 0.08);
+  --cf-radius: 14px;
+  --cf-shadow: 0 20px 45px -22px rgba(20, 1, 2, 0.3),
+    0 2px 10px rgba(20, 1, 2, 0.06);
 }
 
 /* Centers the form on the page and gives it breathing room on all screens */
@@ -33,28 +38,60 @@
 }
 
 .contact-form {
+  position: relative;
   width: 100%;
   max-width: 520px;
-  background: var(--cf-bg);
-  border: 1px solid var(--cf-border);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(215, 219, 224, 0.8);
   border-radius: var(--cf-radius);
   box-shadow: var(--cf-shadow);
-  padding: 2rem;
+  padding: 2.25rem;
   box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+
+/* Slim brand-colored accent bar along the top edge of the card */
+.contact-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cf-accent), #f59e0b);
 }
 
 .contact-form-title {
   margin: 0 0 0.35rem 0;
-  font-size: 1.6rem;
+  font-family: "Oswald", "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 1.7rem;
   font-weight: 700;
   color: var(--cf-text);
 }
 
 .contact-form-subtitle {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem 0;
   font-size: 0.95rem;
   color: var(--cf-text-muted);
   line-height: 1.5;
+}
+
+/* Helper text sitting above the input fields — sets expectations before
+   the visitor starts typing. */
+.contact-form-helper {
+  margin: 0 0 1.5rem 0;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--cf-text);
+  background: rgba(209, 0, 18, 0.06);
+  border: 1px solid rgba(209, 0, 18, 0.18);
+  border-left: 3px solid var(--cf-accent);
+  border-radius: 8px;
 }
 
 .form-group {
@@ -88,13 +125,25 @@
 .form-group input::placeholder,
 .form-group textarea::placeholder {
   color: #9aa1ab;
+  font-style: italic;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: var(--cf-border-focus);
-  box-shadow: 0 0 0 3px rgba(58, 109, 240, 0.15);
+  box-shadow: 0 0 0 3px rgba(209, 0, 18, 0.15);
+  background: var(--cf-bg);
+}
+
+/* Small muted hint shown under a field, e.g. "We'll only use this to
+   reply to your inquiry." Distinct from .error-message so both can be
+   swapped in/out without layout jumps. */
+.field-hint {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--cf-text-muted);
+  line-height: 1.4;
 }
 
 .form-group input:disabled,
@@ -115,29 +164,58 @@
 }
 
 .submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1rem;
   font-size: 1rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
   color: #ffffff;
-  background: var(--cf-accent);
+  background: linear-gradient(90deg, var(--cf-accent), var(--cf-accent-hover));
+  box-shadow: 0 12px 28px -10px rgba(209, 0, 18, 0.55);
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.05s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: var(--cf-accent-hover);
+  background: linear-gradient(90deg, var(--cf-accent-hover), var(--cf-accent));
+  box-shadow: 0 16px 34px -8px rgba(185, 28, 28, 0.65);
+  transform: translateY(-2px);
 }
 
 .submit-button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .submit-button:disabled {
-  background: #9aa7c2;
+  background: #b6bcc9;
+  box-shadow: none;
   cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner shown via .submit-button--loading (add this class alongside
+   "Sending…" text while isSending is true) — pure CSS, no extra markup
+   beyond one wrapping span needed in the JSX. */
+.submit-button__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: cf-spin 0.7s linear infinite;
+}
+
+@keyframes cf-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Visible focus ring for keyboard navigation (accessibility) */
@@ -199,5 +277,9 @@
 @media (prefers-reduced-motion: reduce) {
   .submit-button {
     transition: none;
+  }
+
+  .submit-button__spinner {
+    animation-duration: 1.4s;
   }
 }

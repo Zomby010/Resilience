@@ -122,7 +122,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="contact-form-wrapper">
+    <div id="contact-form" className="contact-form-wrapper">
       <form
         ref={formRef}
         className="contact-form"
@@ -132,6 +132,14 @@ export default function ContactForm() {
         <h2 className="contact-form-title">Get in touch</h2>
         <p className="contact-form-subtitle">
           Fill out the form below and I'll get back to you as soon as possible.
+        </p>
+
+        {/* Sets expectations before the visitor starts typing. Also the
+            landing point + first-field focus target for the footer's
+            "Email Us" card (see scrollToContactForm() in Footer.jsx). */}
+        <p className="contact-form-helper">
+          Tell us about your security needs and our team will contact you
+          with a tailored solution.
         </p>
 
         {/* NAME FIELD */}
@@ -168,6 +176,11 @@ export default function ContactForm() {
           {errors.user_email && (
             <span className="error-message">{errors.user_email}</span>
           )}
+          {!errors.user_email && (
+            <span className="field-hint">
+              We'll only use this to reply to your inquiry.
+            </span>
+          )}
         </div>
 
         {/* MESSAGE FIELD */}
@@ -186,10 +199,21 @@ export default function ContactForm() {
           {errors.message && (
             <span className="error-message">{errors.message}</span>
           )}
+          {!errors.message && (
+            <span className="field-hint">
+              A few sentences about the site, risk, or system you'd like
+              secured helps us respond faster.
+            </span>
+          )}
         </div>
 
         {/* SUBMIT BUTTON — disabled while sending to prevent duplicate sends */}
-        <button type="submit" className="submit-button" disabled={isSending}>
+        <button
+          type="submit"
+          className={`submit-button${isSending ? " submit-button--loading" : ""}`}
+          disabled={isSending}
+        >
+          {isSending && <span className="submit-button__spinner" aria-hidden="true" />}
           {isSending ? "Sending..." : "Send Message"}
         </button>
 

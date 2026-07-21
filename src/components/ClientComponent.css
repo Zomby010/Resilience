@@ -221,7 +221,7 @@
 }
 
 .sr-subtitle--light {
-  color: rgba(238, 238, 238, 0.75);
+  color: rgba(238, 238, 238, 0.88);
 }
 
 /* Glass card */
@@ -949,8 +949,8 @@
 .sr-registry__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
+  gap: 1.1rem;
+  margin-top: 2rem;
 }
 
 .sr-registry__meta-chip {
@@ -971,11 +971,138 @@
   margin-right: 0.3rem;
 }
 
+/* ---- Prominent stat cards: "27 Active Sites" / "7 Regions Logged" -
+   Scoped as a modifier on the existing chip so any other page reusing
+   the plain .sr-registry__meta-chip class is unaffected. ------------- */
+.sr-registry__meta-chip--stat {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 1.6rem 2.1rem 1.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.02)
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 45px -18px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 34px -8px rgba(245, 158, 11, 0.28);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.sr-registry__meta-chip--stat:hover {
+  transform: translateY(-6px);
+  border-color: rgba(245, 158, 11, 0.65);
+  box-shadow: 0 32px 64px -18px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 48px -6px rgba(245, 158, 11, 0.42);
+}
+
+.sr-registry__meta-chip--stat .sr-registry__meta-chip__value {
+  display: block;
+  font-family: var(--sr-font-display);
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--sr-white);
+  margin: 0 0 0.4rem;
+  text-shadow: 0 0 26px rgba(245, 158, 11, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 640px) {
+  .sr-registry__meta-chip--stat .sr-registry__meta-chip__value {
+    font-size: 3.25rem;
+  }
+}
+
+.sr-registry__meta-chip--stat .sr-registry__meta-chip__label {
+  font-family: var(--sr-font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Subtle pulsing accent dot, top-right corner of each stat card */
+.sr-registry__meta-chip--stat .sr-registry__meta-chip__pulse {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--sr-gold);
+  animation: sr-stat-pulse 2.4s ease-out infinite;
+}
+
+@keyframes sr-stat-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+/* Slow diagonal sheen sweep for a "premium security tech" glass feel */
+.sr-registry__meta-chip--stat::after {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  animation: sr-stat-sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sr-stat-sheen {
+  0%,
+  45% {
+    transform: translateX(-120%);
+  }
+  60%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (max-width: 480px) {
+  .sr-registry__meta-chip--stat {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-registry__meta-chip--stat::after,
+  .sr-registry__meta-chip--stat .sr-registry__meta-chip__pulse {
+    animation: none;
+  }
+}
+
 /* ---- Outer/parent grid: one glassmorphic card per region --------- */
 .sr-registry-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.75rem;
+  gap: 2rem;
   margin-top: 2.75rem;
   align-items: start;
 }
@@ -1002,13 +1129,48 @@
   height: 100%;
 }
 
+/* Darker, glossy glass override — scoped to region cards inside the
+   registry grid so the base .sr-glass class (also used by lighter
+   sections like Gallery/Services) keeps its original look. */
+.sr-registry-grid .sr-region-card {
+  padding: 2rem 1.85rem 1.9rem;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(20, 1, 2, 0.4) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 26px 58px -22px rgba(0, 0, 0, 0.7),
+    0 3px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.sr-registry-grid .sr-region-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.6rem;
+  right: 1.6rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--sr-gold), transparent);
+  opacity: 0.75;
+}
+
+.sr-registry-grid .sr-region-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 36px 72px -22px rgba(0, 0, 0, 0.8),
+    0 4px 18px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
 .sr-region-card__header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding-bottom: 1rem;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(203, 213, 225, 0.15);
+  gap: 0.85rem;
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .sr-region-card__icon {
@@ -1057,7 +1219,7 @@
 .sr-region-card__clients {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 @media (min-width: 480px) {
@@ -1067,30 +1229,42 @@
 }
 
 .sr-client-chip {
+  position: relative;
   border-radius: 0.85rem;
-  border: 1px solid rgba(203, 213, 225, 0.15);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.015)
+  );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 0.85rem 1rem;
+  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   transition: transform 0.3s ease, background-color 0.3s ease,
     border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .sr-client-chip:hover {
   transform: translateY(-4px);
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(
+    160deg,
+    rgba(245, 158, 11, 0.14),
+    rgba(245, 158, 11, 0.03)
+  );
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 18px 36px -14px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .sr-client-chip__name {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--sr-white);
 }
 
@@ -1099,9 +1273,9 @@
   align-items: center;
   gap: 0.3rem;
   font-family: var(--sr-font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 0.05em;
-  color: var(--sr-silver);
+  color: #dbe4ee;
 }
 
 .sr-client-chip__loc svg {
@@ -1163,6 +1337,372 @@
   color: var(--sr-black);
   font-size: 0.95rem;
   margin-top: 0.2rem;
+}
+
+/* Both channel cards render as <a>/<button> — reset the native link
+   underline and give them a shared, accessible focus ring so WhatsApp,
+   Email, and the Office popup trigger all read as one consistent set. */
+.sr-contact-card {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sr-contact-card:focus-visible {
+  outline: 2px solid var(--sr-red);
+  outline-offset: 3px;
+}
+
+.sr-contact-card__icon {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sr-contact-card:hover .sr-contact-card__icon {
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 10px 26px -6px rgba(209, 0, 18, 0.55);
+}
+
+/* =======================================================================
+   SERVICE SELECTION
+   "Which Service Would You Like Secured?" — glassmorphic panel housing
+   the six service buttons, sitting inside the light Contact section.
+======================================================================= */
+.sr-services {
+  position: relative;
+  margin: 2.5rem 0 0;
+  padding: 2rem 1.5rem 2.25rem;
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 45px -22px rgba(20, 1, 2, 0.25),
+    0 2px 10px rgba(20, 1, 2, 0.05);
+}
+
+@media (min-width: 768px) {
+  .sr-services {
+    padding: 2.5rem 3rem 2.75rem;
+  }
+}
+
+.sr-services__heading {
+  margin: 0 0 1.5rem;
+  font-family: var(--sr-font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--sr-black);
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+/* Subtle accent under the heading, echoing .sr-heading__underline */
+.sr-services__heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 3.25rem;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sr-red), var(--sr-gold));
+}
+
+.sr-services__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.sr-service-btn {
+  padding: 0.75rem 1.35rem;
+  font-family: var(--sr-font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--sr-black);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 999px;
+  box-shadow: 0 6px 16px -8px rgba(20, 1, 2, 0.15);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.sr-service-btn:hover {
+  color: var(--sr-white);
+  background: linear-gradient(120deg, var(--sr-red), var(--sr-crimson));
+  border-color: transparent;
+  box-shadow: 0 14px 30px -10px rgba(209, 0, 18, 0.55);
+  transform: translateY(-2px);
+}
+
+.sr-service-btn:active {
+  transform: translateY(0);
+}
+
+.sr-service-btn:focus-visible {
+  outline: 2px solid var(--sr-red);
+  outline-offset: 3px;
+}
+
+/* Responsive layout: full-bleed stacked pills on very small screens so
+   long service names never get clipped or force horizontal scroll. */
+@media (max-width: 480px) {
+  .sr-services__grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sr-service-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* =======================================================================
+   MODAL SHELL
+   Shared by the Service Inquiry modal and the Office Location modal.
+======================================================================= */
+.sr-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(20, 1, 2, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.sr-modal__panel {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--sr-black);
+  color: var(--sr-light);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.75rem 1.75rem;
+  animation: sr-modal-fade-in 0.3s ease both;
+}
+
+@keyframes sr-modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.sr-modal__panel:focus-visible {
+  outline: none;
+}
+
+.sr-modal__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sr-modal__close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.sr-modal__close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.sr-modal__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--sr-red), var(--sr-crimson));
+}
+
+.sr-modal__icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--sr-white);
+}
+
+.sr-modal__title {
+  margin: 0 0 0.35rem;
+  font-family: var(--sr-font-display);
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sr-modal__subtitle {
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.sr-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sr-modal__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.sr-modal__field label {
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sr-modal__field input {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sr-modal__field input::placeholder {
+  color: rgba(238, 238, 238, 0.45);
+}
+
+.sr-modal__field input:focus {
+  outline: none;
+  border-color: var(--sr-red);
+  box-shadow: 0 0 0 3px rgba(209, 0, 18, 0.25);
+}
+
+.sr-modal__error {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #ff8a8a;
+}
+
+.sr-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sr-modal__actions .sr-btn {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.sr-modal__address {
+  font-style: normal;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* ---- Light variant — used only by the Office Location popup --------
+   Everything else in the modal shell defaults to the dark theme above;
+   this modifier flips just the surface + text so the address stays
+   crisp and legible on a bright card, per the office-popup redesign. */
+.sr-modal__panel--location {
+  background: var(--sr-white);
+  color: var(--sr-black);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  box-shadow: 0 24px 60px -18px rgba(20, 1, 2, 0.3),
+    0 4px 16px rgba(20, 1, 2, 0.08);
+}
+
+.sr-modal__panel--location .sr-modal__close {
+  color: var(--sr-charcoal);
+  background: var(--sr-light);
+}
+
+.sr-modal__panel--location .sr-modal__close:hover {
+  background: rgba(209, 0, 18, 0.12);
+  color: var(--sr-red);
+}
+
+.sr-modal__panel--location .sr-modal__title {
+  color: var(--sr-black);
+}
+
+.sr-modal__panel--location .sr-modal__address {
+  color: var(--sr-charcoal);
+  opacity: 1;
+}
+
+.sr-modal__panel--location .sr-modal__address div {
+  padding: 0.15rem 0;
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .sr-modal__panel {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+
+  .sr-modal__actions {
+    flex-direction: column;
+  }
+}
+
+/* Respect users who prefer reduced motion — framer-motion already reads
+   this via its own reduced-motion handling, but keep hover transitions
+   calm too. */
+@media (prefers-reduced-motion: reduce) {
+  .sr-service-btn,
+  .sr-modal__close,
+  .sr-modal__panel {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* WhatsApp "Continue on WhatsApp" action inside the Service Inquiry
+   modal — kept within the brand's red/black palette (no off-brand
+   green) so it still reads as part of the same design system. */
+.sr-btn--whatsapp {
+  color: var(--sr-white);
+  background: linear-gradient(90deg, #1e293b, var(--sr-black));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.sr-btn--whatsapp:hover {
+  background: linear-gradient(90deg, var(--sr-black), #1e293b);
+  border-color: var(--sr-red);
+  transform: translateY(-2px);
 }
 
 /* =======================================================================

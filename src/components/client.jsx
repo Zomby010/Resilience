@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { MapPin, Building2 } from "lucide-react";
 
 import "./ClientComponent.css";
@@ -31,8 +31,8 @@ import "./ClientComponent.css";
 // ---------------------------------------------------------------------------
 const Reveal = ({ children, delay = 0, className = "" }) => (
   <motion.div
-    initial={{ opacity: 0, y: 22 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    initial={{ opacity: 0, y: 22, filter: "blur(4px)" }}
+    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
     viewport={{ once: true, amount: 0.3 }}
     transition={{ duration: 0.6, ease: "easeOut", delay }}
     className={className}
@@ -40,6 +40,41 @@ const Reveal = ({ children, delay = 0, className = "" }) => (
     {children}
   </motion.div>
 );
+
+// ---------------------------------------------------------------------------
+// Shared: count-up number, animates 0 -> value once it scrolls into view
+// ---------------------------------------------------------------------------
+const CountUp = ({ value, duration = 1.6 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.6 });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    let frame;
+    let start;
+
+    const tick = (timestamp) => {
+      if (start === undefined) start = timestamp;
+      const progress = Math.min((timestamp - start) / (duration * 1000), 1);
+      // ease-out cubic — quick start, gentle settle
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * value));
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [isInView, value, duration]);
+
+  return (
+    <span ref={ref} aria-hidden="true">
+      {display}
+    </span>
+  );
+};
 
 // ---------------------------------------------------------------------------
 // CLIENT REGISTRY — signature section, real data from clients.pdf
@@ -129,11 +164,27 @@ const ClientRegistry = () => (
           behind the "27 sites" figure quoted above.
         </p>
         <div className="sr-registry__meta">
-          <span className="sr-registry__meta-chip">
-            <strong>{TOTAL_CLIENTS}</strong>Active Sites
+          <span
+            className="sr-registry__meta-chip sr-registry__meta-chip--stat"
+            role="text"
+            aria-label={`${TOTAL_CLIENTS} Active Sites`}
+          >
+            <span className="sr-registry__meta-chip__pulse" aria-hidden="true" />
+            <strong className="sr-registry__meta-chip__value">
+              <CountUp value={TOTAL_CLIENTS} />
+            </strong>
+            <span className="sr-registry__meta-chip__label">Active Sites</span>
           </span>
-          <span className="sr-registry__meta-chip">
-            <strong>{CLIENT_REGISTRY.length}</strong>Regions Logged
+          <span
+            className="sr-registry__meta-chip sr-registry__meta-chip--stat"
+            role="text"
+            aria-label={`${CLIENT_REGISTRY.length} Regions Logged`}
+          >
+            <span className="sr-registry__meta-chip__pulse" aria-hidden="true" />
+            <strong className="sr-registry__meta-chip__value">
+              <CountUp value={CLIENT_REGISTRY.length} />
+            </strong>
+            <span className="sr-registry__meta-chip__label">Regions Logged</span>
           </span>
         </div>
       </Reveal>
