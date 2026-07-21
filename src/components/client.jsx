@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { MapPin, Building2 } from "lucide-react";
 
 import "./ClientComponent.css";
 
@@ -12,6 +12,13 @@ import "./ClientComponent.css";
  * Spears Resilience Systems — Client section.
  * Split out of the original ClientComponent.jsx. Contains the Client
  * Registry (signature section, real data from clients.pdf).
+ *
+ * REDESIGNED: the old numbered, single-column log table (CLIENT-001,
+ * CLIENT-002... stacked one per row) has been replaced with a
+ * two-tier glassmorphic dashboard grid — an outer responsive grid of
+ * region cards, each containing an inner grid of unnumbered client
+ * cards with their own hover animations. See .sr-registry-grid /
+ * .sr-region-card* / .sr-client-chip* in ClientComponent.css.
  *
  * The decorative divider that originally sat directly after this section
  * (before the now-removed Statistics section) is kept here as a trailing
@@ -105,76 +112,72 @@ const TOTAL_CLIENTS = CLIENT_REGISTRY.reduce(
   0
 );
 
-const ClientRegistry = () => {
-  let runningIndex = 0;
-
-  return (
-    <section id="registry" className="sr-section sr-section--dark sr-registry">
-      <div className="sr-section__inner">
-        <Reveal>
-          <span className="sr-eyebrow">
-            <span className="sr-eyebrow__dot" aria-hidden="true" />
-            Client Registry
+const ClientRegistry = () => (
+  <section id="registry" className="sr-section sr-section--dark sr-registry">
+    <div className="sr-section__inner">
+      <Reveal>
+        <span className="sr-eyebrow">
+          <span className="sr-eyebrow__dot" aria-hidden="true" />
+          Client Registry
+        </span>
+        <h2 className="sr-heading sr-heading--light">
+          Sites Under <span className="sr-heading__accent">Our Watch</span>
+        </h2>
+        <span className="sr-heading__underline" aria-hidden="true" />
+        <p className="sr-subtitle sr-subtitle--light">
+          Every active deployment, grouped by region — the full manifest
+          behind the "27 sites" figure quoted above.
+        </p>
+        <div className="sr-registry__meta">
+          <span className="sr-registry__meta-chip">
+            <strong>{TOTAL_CLIENTS}</strong>Active Sites
           </span>
-          <h2 className="sr-heading sr-heading--light">
-            Sites Under <span className="sr-heading__accent">Our Watch</span>
-          </h2>
-          <span className="sr-heading__underline" aria-hidden="true" />
-          <p className="sr-subtitle sr-subtitle--light">
-            Every active deployment, logged by region — the full manifest
-            behind the "27 sites" figure quoted above.
-          </p>
-          <div className="sr-registry__meta">
-            <span className="sr-registry__meta-chip">
-              <strong>{TOTAL_CLIENTS}</strong>Active Sites
-            </span>
-            <span className="sr-registry__meta-chip">
-              <strong>{CLIENT_REGISTRY.length}</strong>Regions Logged
-            </span>
-          </div>
-        </Reveal>
+          <span className="sr-registry__meta-chip">
+            <strong>{CLIENT_REGISTRY.length}</strong>Regions Logged
+          </span>
+        </div>
+      </Reveal>
 
-        <Reveal delay={0.15}>
-          <div className="sr-registry__log">
-            <div className="sr-registry__log-header">
-              <span>ID</span>
-              <span>Client</span>
-              <span>Location</span>
-            </div>
-            {CLIENT_REGISTRY.map((region) => (
-              <div className="sr-registry__region" key={region.region}>
-                <div className="sr-registry__region-label">
-                  <MapPin style={{ width: "0.85rem", height: "0.85rem" }} />
-                  {region.region}
+      {/* Outer/parent grid: one glassmorphic card per region */}
+      <div className="sr-registry-grid">
+        {CLIENT_REGISTRY.map((region, index) => (
+          <Reveal key={region.region} delay={index * 0.06}>
+            <div className="sr-glass sr-region-card">
+              <div className="sr-glass__glow" aria-hidden="true" />
+              <div className="sr-region-card__header">
+                <div className="sr-region-card__icon">
+                  <Building2 aria-hidden="true" />
                 </div>
-                {region.clients.map((client) => {
-                  runningIndex += 1;
-                  return (
-                    <div
-                      className="sr-registry__row"
-                      key={`${client.name}-${client.location}`}
-                    >
-                      <span className="sr-registry__row-id">
-                        CLIENT-{String(runningIndex).padStart(3, "0")}
-                      </span>
-                      <span className="sr-registry__row-name">
-                        {client.name}
-                      </span>
-                      <span className="sr-registry__row-loc">
-                        <MapPin aria-hidden="true" />
-                        {client.location}
-                      </span>
-                    </div>
-                  );
-                })}
+                <h3 className="sr-region-card__title">{region.region}</h3>
+                <span className="sr-region-card__count">
+                  {region.clients.length}
+                </span>
               </div>
-            ))}
-          </div>
-        </Reveal>
+
+              {/* Inner/child grid: unnumbered client cards */}
+              <div className="sr-region-card__clients">
+                {region.clients.map((client) => (
+                  <div
+                    className="sr-client-chip"
+                    key={`${client.name}-${client.location}`}
+                  >
+                    <span className="sr-client-chip__name">
+                      {client.name}
+                    </span>
+                    <span className="sr-client-chip__loc">
+                      <MapPin aria-hidden="true" />
+                      {client.location}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 // ---------------------------------------------------------------------------
 // CLIENT

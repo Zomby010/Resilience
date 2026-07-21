@@ -13,6 +13,12 @@ import "./ClientComponent.css";
  * Solutions" and "Industries Served" sections have been removed and
  * replaced with a new "Corporate Social Responsibility" section.
  *
+ * TYPOGRAPHY: card titles and body copy use dedicated .sr-csr-card__*
+ * classes (see ClientComponent.css) rather than the shared
+ * .sr-service-card__title/__text used by About.jsx's Services cards,
+ * so the bolder/more-legible styling here doesn't bleed into that
+ * unrelated section.
+ *
  * PLACEHOLDER CONTENT: the four CSR items below are placeholders — swap
  * in the company's real CSR programme details before shipping.
  * -----------------------------------------------------------------------
@@ -39,20 +45,20 @@ const Reveal = ({ children, delay = 0, className = "" }) => (
 // ---------------------------------------------------------------------------
 const CSR_ITEMS = [
   {
-    title: "CSR Item 1",
-    text: "Placeholder paragraph — replace with real content describing this initiative.",
+    title: "Community Engagement & Diversity",
+    text: "Spears Resilience Systems Limited recognises contributions made by every individual with whom we involve ourselves, during our CSR engagements and care to the wider community. We embrace diversity in all forms and see it as fundamental in all our dealings with clients, partners, associates and the wider community.",
   },
   {
-    title: "CSR Item 2",
-    text: "Placeholder paragraph — replace with real content describing this initiative.",
+    title: "Employee Welfare & Wellbeing",
+    text: "Spears Resilience Systems believes in caring for our staff, providing them with meaningful employment, equal opportunities and their families' welfare ensuring, as far as we can, their continuing health, safety and mental wellness in the workplace.",
   },
   {
-    title: "CSR Item 3",
-    text: "Placeholder paragraph — replace with real content describing this initiative.",
+    title: "Client Property & IP Protection",
+    text: "We recognise and respect our clients' properties, ensuring a safe and secure environment in regards to their property, including intellectual property as being as important as our own.",
   },
   {
-    title: "CSR Item 4",
-    text: "Placeholder paragraph — replace with real content describing this initiative.",
+    title: "Business Ethics & Integrity",
+    text: "We will deal with our business partners and employees in an honest and honourable manner at all times. Quality and Compliance.",
   },
 ];
 
@@ -73,10 +79,10 @@ const Values = () => (
       <div className="sr-card-grid sr-card-grid--4">
         {CSR_ITEMS.map((item, index) => (
           <Reveal key={item.title} delay={index * 0.08}>
-            <div className="sr-glass sr-service-card">
+            <div className="sr-glass sr-service-card sr-csr-card">
               <div className="sr-glass__glow" aria-hidden="true" />
-              <h3 className="sr-service-card__title">{item.title}</h3>
-              <p className="sr-service-card__text">{item.text}</p>
+              <h3 className="sr-csr-card__title">{item.title}</h3>
+              <p className="sr-csr-card__text">{item.text}</p>
             </div>
           </Reveal>
         ))}

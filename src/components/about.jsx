@@ -198,12 +198,66 @@ const Services = () => (
 );
 
 // ---------------------------------------------------------------------------
+// GALLERY (new section, placed directly below Services)
+// -----------------------------------------------------------------------
+// 9 image placeholders (gallery1.jpg – gallery9.jpg) in a responsive
+// grid. Each image sits in a fixed-aspect-ratio "frame" with
+// overflow:hidden so it can never bleed past its rounded corners or
+// shift surrounding layout while loading — see .sr-gallery-item__frame
+// in ClientComponent.css. Swap the `src` values below for real asset
+// paths (e.g. imported images or a CMS URL) when photography is ready.
+// ---------------------------------------------------------------------------
+const GALLERY_IMAGES = Array.from({ length: 9 }, (_, index) => ({
+  src: `/gallery${index + 1}.jpg`,
+  alt: `Spears Resilience Systems on-site personnel and equipment — photo ${
+    index + 1
+  }`,
+}));
+
+const Gallery = () => (
+  <section id="gallery" className="sr-section sr-section--light">
+    <div className="sr-section__inner">
+      <Reveal>
+        <span className="sr-eyebrow">
+          <span className="sr-eyebrow__dot" aria-hidden="true" />
+          Gallery
+        </span>
+        <h2 className="sr-heading">
+          Our Work, <span className="sr-heading__accent">On Site</span>
+        </h2>
+        <span className="sr-heading__underline" aria-hidden="true" />
+        <p className="sr-subtitle">
+          A look at our personnel, equipment, and installations across
+          active client sites.
+        </p>
+      </Reveal>
+
+      <div className="sr-gallery-grid">
+        {GALLERY_IMAGES.map((image, index) => (
+          <Reveal key={image.src} delay={index * 0.05}>
+            <div className="sr-gallery-item__frame">
+              <img
+                src={image.src}
+                alt={image.alt}
+                loading="lazy"
+                className="sr-gallery-item__img"
+              />
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// ---------------------------------------------------------------------------
 // ABOUT
 // ---------------------------------------------------------------------------
 const About = () => (
   <>
     <Overview />
     <Services />
+    <Gallery />
   </>
 );
 

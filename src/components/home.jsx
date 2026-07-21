@@ -12,7 +12,7 @@ import "./ClientComponent.css";
  * Spears Resilience Systems — Home section.
  * Split out of the original ClientComponent.jsx. Contains the in-page
  * section nav and the hero (introduction, "Request a Consultation" and
- * "View Client Registry" buttons).
+ * "View Our Client Registry" buttons).
  * -----------------------------------------------------------------------
  */
 
@@ -36,10 +36,17 @@ const Reveal = ({ children, delay = 0, className = "" }) => (
 // NOTE: links to sections removed elsewhere in this refactor (Solutions,
 // Industries, Stats, Why Us, Compliance, Testimonials, Leadership,
 // Milestones) have been dropped so the nav doesn't point at dead anchors.
+// "Gallery" was added below since About.jsx now includes a #gallery
+// section directly under Services.
+// REDESIGN: the bar itself is full-width and each link is rendered as
+// an equal-width grid segment (see .sr-nav__scroll / .sr-nav__link in
+// ClientComponent.css) instead of the previous scrolling pill list, so
+// it stays evenly divided and legible on desktop, tablet, and mobile.
 // ---------------------------------------------------------------------------
 const SECTION_LINKS = [
   { href: "#overview", label: "Overview" },
   { href: "#services", label: "Services" },
+  { href: "#gallery", label: "Gallery" },
   { href: "#registry", label: "Clients" },
   { href: "#contact", label: "Contact" },
 ];
@@ -91,8 +98,11 @@ const Hero = () => (
             Request a Consultation
             <ArrowRight className="sr-btn__icon" aria-hidden="true" />
           </a>
-          <a href="#registry" className="sr-btn sr-btn--ghost">
-            View Client Registry
+          {/* Restyled with the new .sr-btn--glass variant (frosted/glassmorphic)
+              in place of the flat .sr-btn--ghost look, per the requested
+              premium redesign of this CTA. */}
+          <a href="#registry" className="sr-btn sr-btn--glass">
+            View Our Client Registry
           </a>
         </div>
       </Reveal>

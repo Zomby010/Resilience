@@ -1,0 +1,203 @@
+/* ==========================================================================
+   ContactForm.css
+   Styling for the ContactForm component.
+   Colors and spacing are defined as CSS variables at the top for easy
+   theming — change these to match your site's branding.
+   ========================================================================== */
+
+:root {
+  --cf-bg: #ffffff;
+  --cf-surface: #f7f8fa;
+  --cf-border: #d7dbe0;
+  --cf-border-focus: #3a6df0;
+  --cf-text: #1c1f26;
+  --cf-text-muted: #6b7280;
+  --cf-accent: #3a6df0;
+  --cf-accent-hover: #2c56c9;
+  --cf-error: #d64545;
+  --cf-error-bg: #fdeceb;
+  --cf-success: #1e7e45;
+  --cf-success-bg: #e9f8ee;
+  --cf-radius: 10px;
+  --cf-shadow: 0 8px 24px rgba(20, 24, 33, 0.08);
+}
+
+/* Centers the form on the page and gives it breathing room on all screens */
+.contact-form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.contact-form {
+  width: 100%;
+  max-width: 520px;
+  background: var(--cf-bg);
+  border: 1px solid var(--cf-border);
+  border-radius: var(--cf-radius);
+  box-shadow: var(--cf-shadow);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.contact-form-title {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--cf-text);
+}
+
+.contact-form-subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
+  color: var(--cf-text-muted);
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cf-text);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--cf-text);
+  background: var(--cf-surface);
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9aa1ab;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--cf-border-focus);
+  box-shadow: 0 0 0 3px rgba(58, 109, 240, 0.15);
+}
+
+.form-group input:disabled,
+.form-group textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Highlighted border for fields that failed validation */
+.input-error {
+  border-color: var(--cf-error) !important;
+}
+
+.error-message {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--cf-error);
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--cf-accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: var(--cf-accent-hover);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.submit-button:disabled {
+  background: #9aa7c2;
+  cursor: not-allowed;
+}
+
+/* Visible focus ring for keyboard navigation (accessibility) */
+.submit-button:focus-visible,
+.form-group input:focus-visible,
+.form-group textarea:focus-visible {
+  outline: 2px solid var(--cf-border-focus);
+  outline-offset: 2px;
+}
+
+.status-message {
+  margin: 1.1rem 0 0 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.status-success {
+  color: var(--cf-success);
+  background: var(--cf-success-bg);
+  border: 1px solid rgba(30, 126, 69, 0.25);
+}
+
+.status-error {
+  color: var(--cf-error);
+  background: var(--cf-error-bg);
+  border: 1px solid rgba(214, 69, 69, 0.25);
+}
+
+/* ==========================================================================
+   Responsive breakpoints
+   ========================================================================== */
+
+/* Tablets and small laptops */
+@media (max-width: 640px) {
+  .contact-form {
+    padding: 1.5rem;
+  }
+
+  .contact-form-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .contact-form-wrapper {
+    padding: 1rem 0.5rem;
+  }
+
+  .contact-form {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .submit-button {
+    transition: none;
+  }
+}

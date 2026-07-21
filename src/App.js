@@ -5,7 +5,7 @@ import About from "./components/about.jsx";
 import Values from "./components/values.jsx";
 import Client from "./components/client.jsx";
 import Footer from "./components/footer.jsx";
-
+import Contact from "./components/contactForm.jsx";
 class App extends Component {
   render() {
     return (
@@ -13,10 +13,11 @@ class App extends Component {
         {/* <AboutSection /> */}
         {/* <Clients /> */}
         <Home />
-        <About />
+        <About /> 
         <Values />
         <Client />
         <Footer />
+        <Contact /> 
       </div>
     );
   }

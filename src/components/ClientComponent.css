@@ -317,6 +317,62 @@
   transform: translateY(-2px);
 }
 
+/* Premium glassmorphic variant — used for the Hero's secondary CTA
+   ("View Our Client Registry"). Kept as its own class (rather than
+   editing .sr-btn--ghost above) so any other component still relying
+   on the plain ghost style elsewhere is unaffected. */
+.sr-btn--glass {
+  position: relative;
+  overflow: hidden;
+  color: var(--sr-white);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.06)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px -10px rgba(20, 1, 2, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Diagonal light sweep on hover for a frosted "shimmer" effect */
+.sr-btn--glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.65s ease;
+}
+
+.sr-btn--glass:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(245, 158, 11, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1)
+  );
+  box-shadow: 0 18px 42px -12px rgba(209, 0, 18, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.sr-btn--glass:hover::before {
+  transform: translateX(130%);
+}
+
+.sr-btn--glass:focus-visible {
+  outline: 2px solid var(--sr-gold);
+  outline-offset: 3px;
+}
+
 .sr-btn__icon {
   width: 1rem;
   height: 1rem;
@@ -344,11 +400,21 @@
 
 /* ---------------------------------------------------------------------
    In-page navigation
+   REDESIGNED: previously a horizontally-scrolling row of pill links
+   capped at 78rem and centered (so it never truly touched the screen
+   edges on wide viewports, and shrank/scrolled unpredictably on small
+   ones). Now a full-bleed segmented bar: the wrapper stretches to
+   100% width and the links sit in a CSS grid with `auto-fit` columns,
+   so every link is always an equal fraction of the available width
+   at any breakpoint (desktop, tablet, or mobile), wrapping to
+   additional equal-width rows only if a viewport is too narrow to
+   fit them on one line. No horizontal scrolling required.
 --------------------------------------------------------------------- */
 .sr-nav {
   position: sticky;
   top: 0;
   z-index: 40;
+  width: 100%;
   background: rgba(20, 1, 2, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -356,41 +422,71 @@
 }
 
 .sr-nav__scroll {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  padding: 0.85rem 1.25rem;
-  max-width: 78rem;
-  margin: 0 auto;
-  scrollbar-width: none;
-}
-
-.sr-nav__scroll::-webkit-scrollbar {
-  display: none;
+  display: grid;
+  /* Each link becomes an equal 1fr column; auto-fit lets the browser
+     recalculate how many equal columns fit per row as the viewport
+     changes, so the bar always spans edge-to-edge. */
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
 .sr-nav__link {
-  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-align: center;
   font-family: var(--sr-font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--sr-silver);
   text-decoration: none;
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid rgba(203, 213, 225, 0.2);
+  padding: 1.05rem 1rem;
+  border-right: 1px solid rgba(203, 213, 225, 0.12);
   white-space: nowrap;
-  transition: color 0.25s ease, border-color 0.25s ease,
-    background-color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.25s ease;
+}
+
+.sr-nav__link:last-child {
+  border-right: none;
+}
+
+/* Animated underline sweeps in from center on hover/focus for a more
+   premium, deliberate feel than the old flat pill background swap. */
+.sr-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 60%;
+  height: 2px;
+  transform: translateX(-50%) scaleX(0);
+  background: linear-gradient(90deg, var(--sr-red), var(--sr-gold));
+  transition: transform 0.3s ease;
 }
 
 .sr-nav__link:hover,
 .sr-nav__link:focus-visible {
   color: var(--sr-white);
-  border-color: var(--sr-gold);
-  background-color: rgba(245, 158, 11, 0.12);
+  background-color: rgba(245, 158, 11, 0.08);
   outline: none;
+}
+
+.sr-nav__link:hover::after,
+.sr-nav__link:focus-visible::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+@media (min-width: 768px) {
+  .sr-nav__link {
+    font-size: 0.78rem;
+    padding: 1.15rem 1.25rem;
+  }
 }
 
 /* =======================================================================
@@ -720,7 +816,131 @@
 }
 
 /* =======================================================================
+   CORPORATE SOCIAL RESPONSIBILITY (Values.jsx card typography)
+   NOTE: Values.jsx reuses the shared .sr-glass / .sr-service-card /
+   .sr-card-grid--4 classes for its card shell and grid layout (so the
+   spacing and structure stay consistent with the rest of the site),
+   but the title and body text get their own dedicated classes here
+   instead of overriding .sr-service-card__title/__text — those are
+   also used by About.jsx's unrelated Services cards, and editing them
+   directly would have changed that section too.
+======================================================================= */
+.sr-csr-card {
+  /* Slightly more generous padding than the default service card, for
+     the "better spaced" requirement. */
+  padding: 2.25rem;
+}
+
+.sr-csr-card__title {
+  font-family: var(--sr-font-display);
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  /* Brand red instead of near-black: matches the site's accent color
+     (used in the eyebrow dot, glows, and buttons elsewhere) and
+     contrasts ~5.4:1 against the section's light background — well
+     within WCAG AA for text this size — while standing clearly apart
+     from the charcoal body copy below. */
+  color: var(--sr-red);
+  margin: 0 0 0.85rem;
+}
+
+.sr-csr-card__text {
+  font-size: 0.975rem;
+  font-weight: 500;
+  line-height: 1.85;
+  letter-spacing: 0.005em;
+  color: var(--sr-charcoal);
+  margin: 0;
+  flex: 1;
+}
+
+/* Scoped to the --4 modifier, which only Values.jsx currently uses, so
+   this doesn't affect the --5 grid used by About's Services section. */
+@media (min-width: 640px) {
+  .sr-card-grid--4 {
+    gap: 1.75rem;
+  }
+}
+
+/* =======================================================================
+   GALLERY (new section, added below Services in About.jsx)
+   - 2 equal columns on mobile, 3 equal columns (a clean 3x3) from
+     tablet width up.
+   - Each tile is a fixed-aspect-ratio "frame" with overflow hidden,
+     so images can never bleed past the rounded corners or shift the
+     layout while loading, regardless of the source image's own
+     dimensions.
+======================================================================= */
+.sr-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.1rem;
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .sr-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.sr-gallery-item__frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(203, 213, 225, 0.5);
+  background: var(--sr-light);
+  box-shadow: 0 20px 45px -20px rgba(20, 1, 2, 0.25),
+    0 2px 8px rgba(20, 1, 2, 0.06);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.sr-gallery-item__frame:hover {
+  transform: translateY(-6px);
+  border-color: rgba(209, 0, 18, 0.4);
+  box-shadow: 0 30px 60px -20px rgba(209, 0, 18, 0.25),
+    0 4px 14px rgba(20, 1, 2, 0.1);
+}
+
+.sr-gallery-item__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.sr-gallery-item__frame:hover .sr-gallery-item__img {
+  transform: scale(1.08);
+}
+
+/* Subtle darkening overlay on hover, purely decorative/premium touch */
+.sr-gallery-item__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(20, 1, 2, 0.55) 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.sr-gallery-item__frame:hover::after {
+  opacity: 1;
+}
+
+/* =======================================================================
    CLIENT REGISTRY (signature section)
+   REDESIGNED: the old layout was a single-column "log" table — a header
+   row plus stacked numbered rows (CLIENT-001, CLIENT-002...) grouped
+   under plain region labels. That's replaced below with a two-tier
+   dashboard grid: an outer responsive grid of glassmorphic region
+   cards, each containing an inner grid of unnumbered client cards.
 ======================================================================= */
 .sr-registry {
   position: relative;
@@ -741,6 +961,9 @@
   border: 1px solid rgba(203, 213, 225, 0.3);
   border-radius: 999px;
   padding: 0.4rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .sr-registry__meta-chip strong {
@@ -748,82 +971,142 @@
   margin-right: 0.3rem;
 }
 
-.sr-registry__log {
-  margin-top: 2.5rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(203, 213, 225, 0.18);
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  overflow: hidden;
+/* ---- Outer/parent grid: one glassmorphic card per region --------- */
+.sr-registry-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  margin-top: 2.75rem;
+  align-items: start;
 }
 
-.sr-registry__log-header {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr 8rem;
-  padding: 0.85rem 1.5rem;
-  font-family: var(--sr-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--sr-gold);
+@media (min-width: 640px) {
+  .sr-registry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sr-registry-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Region card reuses .sr-glass for the frosted background, rounded
+   corners, border, shadow, and hover-lift animation — kept consistent
+   with every other card on the site — plus its own layout rules. */
+.sr-region-card {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sr-region-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid rgba(203, 213, 225, 0.15);
 }
 
-.sr-registry__region {
-  border-bottom: 1px solid rgba(203, 213, 225, 0.1);
-}
-
-.sr-registry__region-label {
+.sr-region-card__icon {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-family: var(--sr-font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--sr-silver);
-  background: rgba(209, 0, 18, 0.06);
+  justify-content: center;
+  background: linear-gradient(135deg, var(--sr-red), var(--sr-crimson));
+  box-shadow: 0 8px 20px -6px rgba(209, 0, 18, 0.5);
 }
 
-.sr-registry__row {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr 8rem;
-  align-items: center;
-  padding: 0.7rem 1.5rem;
-  transition: background-color 0.2s ease;
-  border-top: 1px solid rgba(203, 213, 225, 0.06);
-}
-
-.sr-registry__row:hover {
-  background: rgba(245, 158, 11, 0.06);
-}
-
-.sr-registry__row-id {
-  font-family: var(--sr-font-mono);
-  font-size: 0.72rem;
-  color: var(--sr-red);
-}
-
-.sr-registry__row-name {
-  font-size: 0.88rem;
+.sr-region-card__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
   color: var(--sr-white);
-  font-weight: 500;
 }
 
-.sr-registry__row-loc {
+.sr-region-card__title {
+  flex: 1;
+  font-family: var(--sr-font-display);
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  color: var(--sr-white);
+  margin: 0;
+}
+
+.sr-region-card__count {
+  flex: none;
+  font-family: var(--sr-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--sr-white);
+  background: var(--sr-red);
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ---- Inner/child grid: unnumbered client cards -------------------- */
+.sr-region-card__clients {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 480px) {
+  .sr-region-card__clients {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sr-client-chip {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(203, 213, 225, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: transform 0.3s ease, background-color 0.3s ease,
+    border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sr-client-chip:hover {
+  transform: translateY(-4px);
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.5);
+}
+
+.sr-client-chip__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--sr-white);
+}
+
+.sr-client-chip__loc {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   font-family: var(--sr-font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
   color: var(--sr-silver);
 }
 
-.sr-registry__row-loc svg {
-  width: 0.8rem;
-  height: 0.8rem;
+.sr-client-chip__loc svg {
+  width: 0.75rem;
+  height: 0.75rem;
   color: var(--sr-gold);
 }
 
