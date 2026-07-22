@@ -47,34 +47,18 @@ import "./ClientComponent.css";
 // Contact constants — single source of truth for WhatsApp/email everywhere
 // they appear, so a future number/address change only has to happen here.
 // ---------------------------------------------------------------------------
-const CONTACT_EMAIL = "franklineo549@gmail.com";
 const WHATSAPP_PHONE = "254718386678"; // digits only, no "+", for wa.me links
 
 const GENERAL_WHATSAPP_MESSAGE =
   "Hello Spears Resilience Systems, I would like to inquire about your services.";
-const GENERAL_EMAIL_SUBJECT = "Website Inquiry — Spears Resilience Systems";
-const GENERAL_EMAIL_BODY =
-  "Hello Spears Resilience Systems,\n\nI would like to inquire about your security services.\n\nName:\nMessage:\n";
-
-// Builds a mailto: link with an encoded subject + body.
-const buildMailtoLink = (email, subject, body) =>
-  `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
-    body
-  )}`;
 
 // Builds a wa.me click-to-chat link with an encoded message.
 const buildWhatsappLink = (phone, message) =>
   `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-// NOTE: the "Email Us" card no longer opens this mailto: link directly —
-// it now scrolls to <ContactForm /> instead (see scrollToContactForm()).
-// Left in place since GENERAL_EMAIL_SUBJECT/BODY may still be useful if
-// you want to wire a mailto fallback back in later.
-const GENERAL_EMAIL_LINK = buildMailtoLink(
-  CONTACT_EMAIL,
-  GENERAL_EMAIL_SUBJECT,
-  GENERAL_EMAIL_BODY
-);
+// NOTE: the "Email Us" card no longer opens a mailto: link directly — it
+// now scrolls to <ContactForm /> instead (see scrollToContactForm()), so
+// there's no general-purpose mailto link/subject/body to build here.
 const GENERAL_WHATSAPP_LINK = buildWhatsappLink(
   WHATSAPP_PHONE,
   GENERAL_WHATSAPP_MESSAGE

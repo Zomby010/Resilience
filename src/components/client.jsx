@@ -166,7 +166,7 @@ const ClientRegistry = () => (
         <div className="sr-registry__meta">
           <span
             className="sr-registry__meta-chip sr-registry__meta-chip--stat"
-            role="text"
+            role="group"
             aria-label={`${TOTAL_CLIENTS} Active Sites`}
           >
             <span className="sr-registry__meta-chip__pulse" aria-hidden="true" />
@@ -177,7 +177,7 @@ const ClientRegistry = () => (
           </span>
           <span
             className="sr-registry__meta-chip sr-registry__meta-chip--stat"
-            role="text"
+            role="group"
             aria-label={`${CLIENT_REGISTRY.length} Regions Logged`}
           >
             <span className="sr-registry__meta-chip__pulse" aria-hidden="true" />
