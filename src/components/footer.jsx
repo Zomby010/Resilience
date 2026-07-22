@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { publishServiceInquiry } from "./contactFormBridge";
 import "./ClientComponent.css";
 
 /**
@@ -21,8 +22,14 @@ import "./ClientComponent.css";
  * Contains:
  *   1. "Which Service Would You Like Secured?" — six service buttons that
  *      open a short inquiry modal (Full Name + Email), then let the
- *      visitor continue the conversation on WhatsApp or Email with the
- *      message pre-filled for that service.
+ *      visitor choose WhatsApp or Email:
+ *        - WhatsApp: unchanged — opens wa.me with the service message
+ *          and their name pre-filled.
+ *        - Email: now hands the message (plus their name/email) to the
+ *          standalone <ContactForm /> via contactFormBridge.js and
+ *          scrolls them to it, so the send goes out through the SAME
+ *          EmailJS service/template/public key already configured
+ *          there, instead of a mailto: link.
  *   2. "Talk To Our Team" — a single WhatsApp button and a single Email
  *      button (general contact, independent of the service picker), plus
  *      an "Our Office" button that opens a location popup instead of
@@ -40,7 +47,7 @@ import "./ClientComponent.css";
 // Contact constants — single source of truth for WhatsApp/email everywhere
 // they appear, so a future number/address change only has to happen here.
 // ---------------------------------------------------------------------------
-const CONTACT_EMAIL = "spearsresiliencesystems@gmail.com";
+const CONTACT_EMAIL = "franklineo549@gmail.com";
 const WHATSAPP_PHONE = "254718386678"; // digits only, no "+", for wa.me links
 
 const GENERAL_WHATSAPP_MESSAGE =
@@ -85,61 +92,54 @@ const OFFICE_ADDRESS_LINES = [
 ];
 
 // ---------------------------------------------------------------------------
-// SERVICES — PLACEHOLDER content. Six services for a physical + digital
-// security company; confirm the exact service names and descriptions
-// before publishing, the same way the phone/email placeholders were
-// confirmed in the original file.
+// SERVICES — kept in sync with the six services listed in About.jsx's
+// `SERVICES` array (Overview/Services section). If a service is renamed,
+// added, or removed there, mirror the change here so the footer's service
+// picker and the About page never drift apart.
+//
+// whatsappMessage is used by the modal's "Continue on WhatsApp" path.
+// The Email path no longer needs its own emailSubject/emailBody — it
+// hands off to <ContactForm />, whose message is derived below by
+// buildServiceInquiryMessage() so there's one place to edit that wording.
 // ---------------------------------------------------------------------------
 const services = [
   {
-    serviceName: "CCTV Installation & Monitoring",
+    serviceName: "Day & Night Guarding",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your CCTV Installation & Monitoring service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — CCTV Installation & Monitoring",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your CCTV Installation & Monitoring service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your Day & Night Guarding service and would like more information.\n\nThank you.",
   },
   {
-    serviceName: "Alarm & Intrusion Detection",
+    serviceName: "Alarm Systems",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your Alarm & Intrusion Detection service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — Alarm & Intrusion Detection",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your Alarm & Intrusion Detection service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your Alarm Systems service and would like more information.\n\nThank you.",
   },
   {
-    serviceName: "Access Control Systems",
+    serviceName: "Fire Extinguishers",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your Access Control Systems service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — Access Control Systems",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your Access Control Systems service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your Fire Extinguishers service and would like more information.\n\nThank you.",
   },
   {
-    serviceName: "Perimeter Security & Fencing",
+    serviceName: "Canine (Dog) Unit",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your Perimeter Security & Fencing service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — Perimeter Security & Fencing",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your Perimeter Security & Fencing service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your Canine (Dog) Unit service and would like more information.\n\nThank you.",
   },
   {
-    serviceName: "Manned Guarding & Patrol",
+    serviceName: "VIP Protection",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your Manned Guarding & Patrol service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — Manned Guarding & Patrol",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your Manned Guarding & Patrol service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your VIP Protection service and would like more information.\n\nThank you.",
   },
   {
-    serviceName: "Cybersecurity Consulting",
+    serviceName: "CCTV Surveillance",
     whatsappMessage:
-      "Hello Spears Resilience Systems,\n\nI am interested in your Cybersecurity Consulting service and would like more information.\n\nThank you.",
-    emailSubject: "Inquiry — Cybersecurity Consulting",
-    emailBody:
-      "Hello Spears Resilience Systems,\n\nMy name is {{name}}.\n\nI would like to inquire about your Cybersecurity Consulting service.\n\nPlease could you share more details on pricing and availability.\n\nThank you.",
+      "Hello Spears Resilience Systems,\n\nI am interested in your CCTV Surveillance service and would like more information.\n\nThank you.",
   },
 ];
+
+// Builds the pre-filled message handed to <ContactForm /> for a given
+// service, e.g. "I would like more information about CCTV Installation
+// & Monitoring."
+const buildServiceInquiryMessage = (service) =>
+  `I would like more information about ${service.serviceName}.`;
 
 // Optional analytics hook — no-ops by default. Wire this up to your
 // analytics provider (GA4, Plausible, PostHog, etc.) if/when one exists.
@@ -243,8 +243,13 @@ const ModalShell = ({ isOpen, onClose, titleId, children, className = "" }) => {
 
 // ---------------------------------------------------------------------------
 // SERVICE INQUIRY MODAL
-// Collects Full Name + Email, then lets the visitor continue via Email
-// or WhatsApp with the message for the selected service pre-filled.
+// Collects Full Name + Email, then lets the visitor choose how to
+// continue:
+//   - WhatsApp: opens wa.me with the service message (name inserted).
+//   - Email: hands the message + name/email to <ContactForm /> via
+//     contactFormBridge.js and scrolls the visitor to it, so the send
+//     goes out through the existing EmailJS flow instead of a mailto:
+//     link.
 // ---------------------------------------------------------------------------
 const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
   const titleId = useId();
@@ -268,17 +273,6 @@ const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
 
   const isValid = fullName.trim().length > 1;
 
-  const buildEmail = () => {
-    const body = service.emailBody.replace(
-      "{{name}}",
-      fullName.trim() || "there"
-    );
-    const bodyWithEmail = email.trim()
-      ? `${body}\n\nMy email: ${email.trim()}`
-      : body;
-    return buildMailtoLink(CONTACT_EMAIL, service.emailSubject, bodyWithEmail);
-  };
-
   const buildWhatsapp = () => {
     const message = fullName.trim()
       ? service.whatsappMessage.replace(
@@ -295,12 +289,19 @@ const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
       return;
     }
     trackContactClick(`service_${channel}_${service.serviceName}`);
+
     if (channel === "email") {
-      window.location.href = buildEmail();
+      publishServiceInquiry({
+        message: buildServiceInquiryMessage(service),
+        name: fullName.trim(),
+        email: email.trim(),
+      });
+      onClose();
+      scrollToContactForm();
     } else {
       window.open(buildWhatsapp(), "_blank", "noopener,noreferrer");
+      onClose();
     }
-    onClose();
   };
 
   return (

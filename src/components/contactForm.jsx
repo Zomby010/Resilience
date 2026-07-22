@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
+import { subscribeServiceInquiry } from "./contactFormBridge";
 import "./ContactForm.css";
 
 /**
@@ -35,6 +36,31 @@ export default function ContactForm() {
 
   // Holds the outcome of the last submission attempt: "success" | "error" | null
   const [submitStatus, setSubmitStatus] = useState(null);
+
+  // Listens for a pre-filled inquiry published by Footer's service
+  // modal (see contactFormBridge.js) once the visitor picks "Continue
+  // by Email". Drops the message — and the name/email they already
+  // typed into the modal — into this form so they land here with
+  // everything ready and just need to hit Send.
+  useEffect(() => {
+    const unsubscribe = subscribeServiceInquiry(({ message, name, email }) => {
+      setFormData((prev) => ({
+        ...prev,
+        message: message || prev.message,
+        user_name: name || prev.user_name,
+        user_email: email || prev.user_email,
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        message: message ? null : prev.message,
+        user_name: name ? null : prev.user_name,
+        user_email: email ? null : prev.user_email,
+      }));
+      setSubmitStatus(null);
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Generic change handler shared by all fields.
   const handleChange = (e) => {

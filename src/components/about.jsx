@@ -15,6 +15,15 @@ import {
 } from "lucide-react";
 
 import "./ClientComponent.css";
+import image1 from "../images/image1.jpg";
+import image2 from "../images/image2.jpeg";
+import image3 from "../images/image3.jpeg";
+import image4 from "../images/image4.jpeg";
+import image5 from "../images/image5.jpeg";
+import image6 from "../images/image6.jpeg";
+import image7 from "../images/image7.jpeg";
+import image8 from "../images/image8.jpeg";
+import image9 from "../images/image9.jpeg";
 
 /**
  * About.jsx
@@ -207,12 +216,12 @@ const Services = () => (
 // in ClientComponent.css. Swap the `src` values below for real asset
 // paths (e.g. imported images or a CMS URL) when photography is ready.
 // ---------------------------------------------------------------------------
-const GALLERY_IMAGES = Array.from({ length: 9 }, (_, index) => ({
-  src: `/gallery${index + 1}.jpg`,
-  alt: `Spears Resilience Systems on-site personnel and equipment — photo ${
-    index + 1
-  }`,
-}));
+const GALLERY_IMAGES = [image1, image2, image3, image4, image5, image6, image7, image8, image9].map(
+  (src, index) => ({
+    src,
+    alt: `Spears Resilience Systems on-site personnel and equipment — photo ${index + 1}`,
+  })
+);
 
 const Gallery = () => (
   <section id="gallery" className="sr-section sr-section--light">
