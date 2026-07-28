@@ -176,21 +176,13 @@ const TOTAL_CLIENTS = CLIENT_REGISTRY.reduce(
 // Tapping a region opens a tooltip/popover (directly beneath the row)
 // listing that region's client + location chips, reusing the same
 // .sr-client-chip styling as the desktop cards. Only one tooltip is open
-// at a time; opening a new one closes whichever was open.
+// at a time; opening a new one closes whichever was open. Closes on an
+// outside tap/click; stays open while the page is scrolled.
 // ---------------------------------------------------------------------------
 const MobileRegistryList = () => {
   // Index of the currently-open region, or null when none is open.
   const [openIndex, setOpenIndex] = useState(null);
   const containerRef = useRef(null);
-
-  // Close the open tooltip as soon as the page scrolls, so it never ends
-  // up floating over content it no longer points at.
-  useEffect(() => {
-    if (openIndex === null) return undefined;
-    const handleScroll = () => setOpenIndex(null);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [openIndex]);
 
   // Close the open tooltip when the user taps/clicks anywhere outside the
   // registry list (pointerdown fires before click, so it feels instant).
