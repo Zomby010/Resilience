@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { MapPin, Building2 } from "lucide-react";
 
 import "./ClientComponent.css";
@@ -77,6 +77,30 @@ const CountUp = ({ value, duration = 1.6 }) => {
 };
 
 // ---------------------------------------------------------------------------
+// Mobile detection — the registry swaps from the full desktop grid to a
+// compact tappable list at <=768px. Uses matchMedia (rather than reading
+// window.innerWidth once) so it stays correct across resizes/rotation,
+// and is registered/cleaned up in a single useEffect.
+// ---------------------------------------------------------------------------
+const MOBILE_BREAKPOINT = 768;
+
+const useIsMobile = (breakpoint = MOBILE_BREAKPOINT) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const update = () => setIsMobile(mql.matches);
+
+    update(); // set initial value on mount
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, [breakpoint]);
+
+  return isMobile;
+};
+
+// ---------------------------------------------------------------------------
 // CLIENT REGISTRY — signature section, real data from clients.pdf
 // ---------------------------------------------------------------------------
 const CLIENT_REGISTRY = [
@@ -147,7 +171,118 @@ const TOTAL_CLIENTS = CLIENT_REGISTRY.reduce(
   0
 );
 
-const ClientRegistry = () => (
+// ---------------------------------------------------------------------------
+// MOBILE REGISTRY — compact, tappable list of the seven region names only.
+// Tapping a region opens a tooltip/popover (directly beneath the row)
+// listing that region's client + location chips, reusing the same
+// .sr-client-chip styling as the desktop cards. Only one tooltip is open
+// at a time; opening a new one closes whichever was open.
+// ---------------------------------------------------------------------------
+const MobileRegistryList = () => {
+  // Index of the currently-open region, or null when none is open.
+  const [openIndex, setOpenIndex] = useState(null);
+  const containerRef = useRef(null);
+
+  // Close the open tooltip as soon as the page scrolls, so it never ends
+  // up floating over content it no longer points at.
+  useEffect(() => {
+    if (openIndex === null) return undefined;
+    const handleScroll = () => setOpenIndex(null);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [openIndex]);
+
+  // Close the open tooltip when the user taps/clicks anywhere outside the
+  // registry list (pointerdown fires before click, so it feels instant).
+  useEffect(() => {
+    if (openIndex === null) return undefined;
+    const handleOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setOpenIndex(null);
+      }
+    };
+    document.addEventListener("pointerdown", handleOutside);
+    return () => document.removeEventListener("pointerdown", handleOutside);
+  }, [openIndex]);
+
+  const toggleRegion = (index) => {
+    // Tapping the open region closes it; tapping a different region
+    // closes whichever tooltip was open and opens the new one instead.
+    setOpenIndex((current) => (current === index ? null : index));
+  };
+
+  return (
+    <div className="sr-mobile-registry" ref={containerRef}>
+      {CLIENT_REGISTRY.map((region, index) => {
+        const isOpen = openIndex === index;
+        return (
+          <div className="sr-mobile-region" key={region.region}>
+            <button
+              type="button"
+              className={
+                "sr-mobile-region__row" +
+                (isOpen ? " sr-mobile-region__row--open" : "")
+              }
+              onClick={() => toggleRegion(index)}
+              aria-expanded={isOpen}
+              aria-controls={`sr-mobile-region-panel-${index}`}
+            >
+              <span className="sr-region-card__icon sr-mobile-region__icon">
+                <Building2 aria-hidden="true" />
+              </span>
+              <span className="sr-mobile-region__name">{region.region}</span>
+              <span className="sr-region-card__count">
+                {region.clients.length}
+              </span>
+            </button>
+
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  id={`sr-mobile-region-panel-${index}`}
+                  role="region"
+                  aria-label={`${region.region} client locations`}
+                  className="sr-mobile-region__tooltip"
+                  initial={{ opacity: 0, height: 0, y: -6 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -6 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <div className="sr-mobile-region__tooltip-inner">
+                    {region.clients.map((client) => (
+                      <div
+                        className="sr-client-chip sr-mobile-region__client"
+                        key={`${client.name}-${client.location}`}
+                      >
+                        <span className="sr-client-chip__name">
+                          {client.name}
+                        </span>
+                        <span className="sr-client-chip__loc">
+                          <MapPin aria-hidden="true" />
+                          {client.location}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const ClientRegistry = () => {
+  // Desktop (>768px): unchanged glassmorphic grid, rendered exactly as
+  // before. Mobile (<=768px): compact tappable region list instead.
+  const isMobile = useIsMobile();
+
+  return (
   <section id="registry" className="sr-section sr-section--dark sr-registry">
     <div className="sr-section__inner">
       <Reveal>
@@ -189,46 +324,51 @@ const ClientRegistry = () => (
         </div>
       </Reveal>
 
-      {/* Outer/parent grid: one glassmorphic card per region */}
-      <div className="sr-registry-grid">
-        {CLIENT_REGISTRY.map((region, index) => (
-          <Reveal key={region.region} delay={index * 0.06}>
-            <div className="sr-glass sr-region-card">
-              <div className="sr-glass__glow" aria-hidden="true" />
-              <div className="sr-region-card__header">
-                <div className="sr-region-card__icon">
-                  <Building2 aria-hidden="true" />
-                </div>
-                <h3 className="sr-region-card__title">{region.region}</h3>
-                <span className="sr-region-card__count">
-                  {region.clients.length}
-                </span>
-              </div>
-
-              {/* Inner/child grid: unnumbered client cards */}
-              <div className="sr-region-card__clients">
-                {region.clients.map((client) => (
-                  <div
-                    className="sr-client-chip"
-                    key={`${client.name}-${client.location}`}
-                  >
-                    <span className="sr-client-chip__name">
-                      {client.name}
-                    </span>
-                    <span className="sr-client-chip__loc">
-                      <MapPin aria-hidden="true" />
-                      {client.location}
-                    </span>
+      {isMobile ? (
+        <MobileRegistryList />
+      ) : (
+        /* Outer/parent grid: one glassmorphic card per region */
+        <div className="sr-registry-grid">
+          {CLIENT_REGISTRY.map((region, index) => (
+            <Reveal key={region.region} delay={index * 0.06}>
+              <div className="sr-glass sr-region-card">
+                <div className="sr-glass__glow" aria-hidden="true" />
+                <div className="sr-region-card__header">
+                  <div className="sr-region-card__icon">
+                    <Building2 aria-hidden="true" />
                   </div>
-                ))}
+                  <h3 className="sr-region-card__title">{region.region}</h3>
+                  <span className="sr-region-card__count">
+                    {region.clients.length}
+                  </span>
+                </div>
+
+                {/* Inner/child grid: unnumbered client cards */}
+                <div className="sr-region-card__clients">
+                  {region.clients.map((client) => (
+                    <div
+                      className="sr-client-chip"
+                      key={`${client.name}-${client.location}`}
+                    >
+                      <span className="sr-client-chip__name">
+                        {client.name}
+                      </span>
+                      <span className="sr-client-chip__loc">
+                        <MapPin aria-hidden="true" />
+                        {client.location}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
+            </Reveal>
+          ))}
+        </div>
+      )}
     </div>
   </section>
-);
+  );
+};
 
 // ---------------------------------------------------------------------------
 // CLIENT
