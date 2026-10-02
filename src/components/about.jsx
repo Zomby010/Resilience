@@ -103,36 +103,6 @@ const Overview = () => (
           </div>
         </Reveal>
 
-        <div className="sr-mv-stack">
-          <Reveal delay={0.1}>
-            <div className="sr-glass sr-mv-card">
-              <div className="sr-glass__glow" aria-hidden="true" />
-              <div className="sr-mv-card__icon">
-                <Target aria-hidden="true" />
-              </div>
-              <h3 className="sr-mv-card__title">Our Mission</h3>
-              <p className="sr-mv-card__text">
-                To be a market leader in the provision of security
-                solutions, giving our clients the most reliable and
-                affordable services.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <div className="sr-glass sr-mv-card">
-              <div className="sr-glass__glow" aria-hidden="true" />
-              <div className="sr-mv-card__icon">
-                <Compass aria-hidden="true" />
-              </div>
-              <h3 className="sr-mv-card__title">Our Vision</h3>
-              <p className="sr-mv-card__text">
-                To be a one-stop shop for security in Kenya by using the
-                most reliable technology that meets international
-                standards.
-              </p>
-            </div>
-          </Reveal>
-        </div>
       </div>
     </div>
   </section>
@@ -308,6 +278,47 @@ const Gallery = () => (
 );
 
 // ---------------------------------------------------------------------------
+// MISSION & VISION (placed after Services and Gallery)
+// ---------------------------------------------------------------------------
+const MissionVision = () => (
+  <section id="mission" className="sr-section sr-section--light">
+    <div className="sr-section__inner">
+      <div className="sr-mv-grid">
+
+          <Reveal delay={0.1}>
+            <div className="sr-glass sr-mv-card">
+              <div className="sr-glass__glow" aria-hidden="true" />
+              <div className="sr-mv-card__icon">
+                <Target aria-hidden="true" />
+              </div>
+              <h3 className="sr-mv-card__title">Our Mission</h3>
+              <p className="sr-mv-card__text">
+                To be a market leader in the provision of security
+                solutions, giving our clients the most reliable and
+                affordable services.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <div className="sr-glass sr-mv-card">
+              <div className="sr-glass__glow" aria-hidden="true" />
+              <div className="sr-mv-card__icon">
+                <Compass aria-hidden="true" />
+              </div>
+              <h3 className="sr-mv-card__title">Our Vision</h3>
+              <p className="sr-mv-card__text">
+                To be a one-stop shop for security in Kenya by using the
+                most reliable technology that meets international
+                standards.
+              </p>
+            </div>
+          </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+// ---------------------------------------------------------------------------
 // ABOUT
 // ---------------------------------------------------------------------------
 const About = () => (
@@ -315,6 +326,7 @@ const About = () => (
     <Overview />
     <Services />
     <Gallery />
+    <MissionVision />
   </>
 );
 
