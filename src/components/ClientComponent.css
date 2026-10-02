@@ -324,13 +324,13 @@
 .sr-btn--glass {
   position: relative;
   overflow: hidden;
-  color: var(--sr-white);
+  color: var(--sr-black);
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.06)
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.5)
   );
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(20, 1, 2, 0.3);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 8px 32px -10px rgba(20, 1, 2, 0.5),
@@ -353,6 +353,7 @@
 }
 
 .sr-btn--glass:hover {
+  color: var(--sr-red);
   transform: translateY(-3px) scale(1.02);
   border-color: rgba(245, 158, 11, 0.55);
   background: linear-gradient(
@@ -496,8 +497,9 @@
   position: relative;
   padding: 6rem 1.5rem 5rem;
   overflow: hidden;
-  background: linear-gradient(150deg, var(--sr-black) 0%, var(--sr-slate) 70%);
-  color: var(--sr-white);
+  /* Light hero so the black/red/white logo watermark stays visible. */
+  background: linear-gradient(150deg, #ffffff 0%, #eef1f6 100%);
+  color: var(--sr-black);
 }
 
 @media (min-width: 768px) {
@@ -511,19 +513,50 @@
   inset: 0;
   background: radial-gradient(
       circle at 15% 20%,
-      rgba(209, 0, 18, 0.35),
+      rgba(209, 0, 18, 0.12),
       transparent 50%
     ),
-    radial-gradient(circle at 85% 80%, rgba(245, 158, 11, 0.15), transparent 55%);
+    radial-gradient(circle at 85% 80%, rgba(245, 158, 11, 0.14), transparent 55%);
 }
 
 .sr-hero__scanline {
   position: absolute;
   inset: 0;
   opacity: 0.05;
-  background-image: linear-gradient(#fff 1px, transparent 1px),
-    linear-gradient(90deg, #fff 1px, transparent 1px);
+  background-image: linear-gradient(#140102 1px, transparent 1px),
+    linear-gradient(90deg, #140102 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+/* Brand watermark: a large, faint, centred logo sitting above the hero
+   background but below all content (.sr-hero__inner is z-index 2). A
+   radial mask fades its edges so it blends into the gradient instead of
+   reading as a pasted image. pointer-events:none keeps every button/link
+   above it fully interactive. */
+.sr-hero__watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: min(92vw, 760px);
+  height: min(80%, 660px);
+  transform: translate(-50%, -50%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.15;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 45%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 45%, transparent 78%);
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .sr-hero__watermark {
+    width: 120vw;
+    height: 70%;
+    opacity: 0.16;
+  }
 }
 
 .sr-hero__inner {
@@ -584,7 +617,8 @@
   max-width: 42rem;
   margin: 1.75rem auto 0;
   font-size: 1.05rem;
-  color: var(--sr-silver);
+  color: var(--sr-charcoal);
+  font-weight: 500;
   line-height: 1.7;
 }
 
@@ -599,8 +633,8 @@
 /* Services ticker */
 .sr-hero__ticker-wrap {
   margin-top: 3.5rem;
-  border-top: 1px solid rgba(203, 213, 225, 0.15);
-  border-bottom: 1px solid rgba(203, 213, 225, 0.15);
+  border-top: 1px solid rgba(20, 1, 2, 0.12);
+  border-bottom: 1px solid rgba(20, 1, 2, 0.12);
   padding: 1rem 0;
   overflow: hidden;
 }
@@ -629,7 +663,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--sr-silver);
+  color: var(--sr-charcoal);
   white-space: nowrap;
 }
 
@@ -815,6 +849,141 @@
   letter-spacing: 0.1em;
 }
 
+/* ---- Services: image + description rows --------------------------------
+   Each service is one rounded card split into an image half and a text
+   half (alternating sides on desktop), so a service's picture and
+   description are always on screen together. Stacks on mobile. */
+.sr-service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.sr-service-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background: var(--sr-white);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  box-shadow: 0 20px 45px -22px rgba(20, 1, 2, 0.25),
+    0 2px 8px rgba(20, 1, 2, 0.06);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.sr-service-row:hover {
+  border-color: rgba(209, 0, 18, 0.35);
+  box-shadow: 0 30px 60px -22px rgba(209, 0, 18, 0.25),
+    0 4px 14px rgba(20, 1, 2, 0.1);
+}
+
+.sr-service-row__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--sr-light);
+}
+
+.sr-service-row__img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.sr-service-row:hover .sr-service-row__img {
+  transform: scale(1.04);
+}
+
+/* Portrait/tall photos: show the whole image (no cropping) over a blurred
+   copy of itself so the letterbox space still looks intentional. */
+.sr-service-row__media--contain::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem;
+  background-image: var(--sr-media-bg);
+  background-size: cover;
+  background-position: center;
+  filter: blur(22px) brightness(0.8);
+}
+
+.sr-service-row__media--contain .sr-service-row__img {
+  object-fit: contain;
+}
+
+.sr-service-row__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.75rem 1.5rem 2rem;
+}
+
+.sr-service-row__body .sr-service-card__icon {
+  margin-bottom: 1rem;
+}
+
+.sr-service-row__body .sr-service-card__index {
+  margin: 0 0 0.5rem;
+  color: var(--sr-red);
+  font-weight: 600;
+}
+
+.sr-service-row:hover .sr-service-card__icon {
+  background-color: var(--sr-red);
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.sr-service-row:hover .sr-service-card__icon svg {
+  color: var(--sr-white);
+}
+
+.sr-service-row__title {
+  font-family: var(--sr-font-display);
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--sr-black);
+  margin: 0 0 0.85rem;
+}
+
+.sr-service-row__text {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--sr-charcoal);
+  margin: 0;
+  max-width: 34rem;
+}
+
+@media (min-width: 860px) {
+  .sr-service-row {
+    grid-template-columns: 1fr 1fr;
+    min-height: 22rem;
+  }
+
+  .sr-service-row__media {
+    aspect-ratio: auto;
+    min-height: 22rem;
+  }
+
+  .sr-service-row--reverse .sr-service-row__media {
+    order: 2;
+  }
+
+  .sr-service-row__body {
+    padding: 2.5rem 3rem;
+  }
+
+  .sr-service-row__title {
+    font-size: 2rem;
+  }
+}
+
 /* =======================================================================
    CORPORATE SOCIAL RESPONSIBILITY (Values.jsx card typography)
    NOTE: Values.jsx reuses the shared .sr-glass / .sr-service-card /
@@ -866,8 +1035,8 @@
 
 /* =======================================================================
    GALLERY (new section, added below Services in About.jsx)
-   - 2 equal columns on mobile, 3 equal columns (a clean 3x3) from
-     tablet width up.
+   - 2 equal columns on mobile/tablet, 4 on desktop (the grid adapts to
+     however many images remain after service images are excluded).
    - Each tile is a fixed-aspect-ratio "frame" with overflow hidden,
      so images can never bleed past the rounded corners or shift the
      layout while loading, regardless of the source image's own
@@ -882,14 +1051,20 @@
 
 @media (min-width: 640px) {
   .sr-gallery-grid {
-    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+  }
+}
+
+/* 4 columns on desktop: the 8 non-service photos form a clean 4x2. */
+@media (min-width: 1024px) {
+  .sr-gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
 .sr-gallery-item__frame {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid rgba(203, 213, 225, 0.5);

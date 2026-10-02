@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { MapPin, Building2 } from "lucide-react";
 
+import { CLIENT_REGISTRY, TOTAL_CLIENTS } from "./clientData";
 import "./ClientComponent.css";
 
 /**
@@ -100,79 +101,10 @@ const useIsMobile = (breakpoint = MOBILE_BREAKPOINT) => {
   return isMobile;
 };
 
-// ---------------------------------------------------------------------------
-// CLIENT REGISTRY — signature section, real data from clients.pdf
-// ---------------------------------------------------------------------------
-const CLIENT_REGISTRY = [
-  {
-    region: "Kisumu & Surrounds",
-    clients: [
-      { name: "Silent Gulf Hotel", location: "Kisumu" },
-      { name: "Lesavana Hotel", location: "Kisumu" },
-      { name: "KESS Suppliers", location: "Kisumu" },
-      { name: "Polly View Hostel", location: "Kisumu" },
-      { name: "Kazuri Gardens Restaurant", location: "Kisumu" },
-      { name: "China Wu Yi Decoration", location: "Kisumu" },
-      { name: "Tripple Flats", location: "Kisumu" },
-      { name: "La Breeze Hotel", location: "Kisumu" },
-      { name: "SawaSawa Bar & Restaurant", location: "Kisumu" },
-    ],
-  },
-  {
-    region: "Sondu / Ahero / Chabera",
-    clients: [
-      { name: "Maraboi Estate", location: "Sondu" },
-      { name: "Asila Miller's", location: "Ahero" },
-      { name: "Pearl Water Ltd", location: "Ahero" },
-      { name: "Pambo Bar and Restaurant", location: "Chabera" },
-      { name: "Sumbird Supermarket", location: "Chabera" },
-    ],
-  },
-  {
-    region: "Mumias / Lwanda",
-    clients: [
-      { name: "Wang Technical Vocational College", location: "Mumias" },
-      { name: "Ebukanga Technical Vocational College", location: "Lwanda" },
-    ],
-  },
-  {
-    region: "Nyamira / Ogembo",
-    clients: [
-      { name: "Stecol Corporation", location: "Nyamira" },
-      { name: "Stecol Corporation", location: "Ogembo" },
-    ],
-  },
-  {
-    region: "Siaya / Usenge / Ugunja / Bondo",
-    clients: [
-      { name: "Alicia Bakery & Confectionous", location: "Usenge" },
-      { name: "Wasafi Hotel", location: "Siaya" },
-      { name: "Azuri Hotel", location: "Ugunja" },
-      { name: "Pride Hotel", location: "Bondo" },
-    ],
-  },
-  {
-    region: "Butere",
-    clients: [
-      { name: "A.C.K Church", location: "Butere" },
-      { name: "Butere Girls", location: "Butere" },
-      { name: "Mabole Boys", location: "Butere" },
-      { name: "St. Luke Cathedral", location: "Butere" },
-    ],
-  },
-  {
-    region: "Oyugis",
-    clients: [{ name: "Ober Boys", location: "Oyugis" }],
-  },
-];
-
-const TOTAL_CLIENTS = CLIENT_REGISTRY.reduce(
-  (sum, region) => sum + region.clients.length,
-  0
-);
+// CLIENT REGISTRY data lives in ./clientData.js (shared with About/Home stats)
 
 // ---------------------------------------------------------------------------
-// MOBILE REGISTRY — compact, tappable list of the seven region names only.
+// MOBILE REGISTRY — compact, tappable list of the region names only.
 // Tapping a region opens a tooltip/popover (directly beneath the row)
 // listing that region's client + location chips, reusing the same
 // .sr-client-chip styling as the desktop cards. Only one tooltip is open
@@ -247,15 +179,17 @@ const MobileRegistryList = () => {
                     {region.clients.map((client) => (
                       <div
                         className="sr-client-chip sr-mobile-region__client"
-                        key={`${client.name}-${client.location}`}
+                        key={`${client.name}-${client.location || ""}`}
                       >
                         <span className="sr-client-chip__name">
                           {client.name}
                         </span>
-                        <span className="sr-client-chip__loc">
-                          <MapPin aria-hidden="true" />
-                          {client.location}
-                        </span>
+                        {client.location && (
+                          <span className="sr-client-chip__loc">
+                            <MapPin aria-hidden="true" />
+                            {client.location}
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -288,7 +222,7 @@ const ClientRegistry = () => {
         <span className="sr-heading__underline" aria-hidden="true" />
         <p className="sr-subtitle sr-subtitle--light">
           Every active deployment, grouped by region — the full manifest
-          behind the "27 sites" figure quoted above.
+          behind the "{TOTAL_CLIENTS} sites" figure quoted above.
         </p>
         <div className="sr-registry__meta">
           <span
@@ -340,15 +274,17 @@ const ClientRegistry = () => {
                   {region.clients.map((client) => (
                     <div
                       className="sr-client-chip"
-                      key={`${client.name}-${client.location}`}
+                      key={`${client.name}-${client.location || ""}`}
                     >
                       <span className="sr-client-chip__name">
                         {client.name}
                       </span>
-                      <span className="sr-client-chip__loc">
-                        <MapPin aria-hidden="true" />
-                        {client.location}
-                      </span>
+                      {client.location && (
+                          <span className="sr-client-chip__loc">
+                            <MapPin aria-hidden="true" />
+                            {client.location}
+                          </span>
+                        )}
                     </div>
                   ))}
                 </div>

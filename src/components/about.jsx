@@ -15,15 +15,26 @@ import {
 } from "lucide-react";
 
 import "./ClientComponent.css";
-import image1 from "../images/image1.jpg";
-import image2 from "../images/image2.jpeg";
-import image3 from "../images/image3.jpeg";
-import image4 from "../images/image4.jpeg";
-import image5 from "../images/image5.jpeg";
-import image6 from "../images/image6.jpeg";
-import image7 from "../images/image7.jpeg";
-import image8 from "../images/image8.jpeg";
-import image9 from "../images/image9.jpeg";
+import { TOTAL_CLIENTS, TOTAL_TOWNS } from "./clientData";
+
+// ---------------------------------------------------------------------------
+// IMAGE REGISTRY
+// Every file named image<N>.(jpg|jpeg|png|webp|gif|avif) in ../images — with
+// or without a space before the number, e.g. "image 10.jpeg" — is picked up
+// automatically and keyed by N, so image1–image14 (and any image added later)
+// work without touching this file.
+// ---------------------------------------------------------------------------
+const imageContext = require.context(
+  "../images",
+  false,
+  /^\.\/image\s?\d+\.(jpe?g|png|webp|gif|avif)$/i
+);
+
+const IMAGES = {};
+imageContext.keys().forEach((key) => {
+  const id = Number(key.match(/(\d+)\.[a-z]+$/i)[1]);
+  IMAGES[id] = imageContext(key);
+});
 
 /**
  * About.jsx
@@ -76,18 +87,18 @@ const Overview = () => (
           </p>
           <p className="sr-overview__copy" style={{ marginTop: "1rem" }}>
             Our footprint spans hospitality, education, retail, faith-based
-            institutions, and corporate clients across Western Kenya —
-            currently 27 active sites across 14 towns, from Kisumu to
-            Nyamira, Siaya to Butere.
+            institutions, and corporate clients across Kenya —
+            currently {TOTAL_CLIENTS} active sites across {TOTAL_TOWNS} towns, from
+            Kisumu to Nyamira, Siaya to Butere and beyond.
           </p>
           <div className="sr-overview__badges">
             <span className="sr-overview__badge">
               <CheckCircle2 style={{ width: "0.85rem", height: "0.85rem" }} />
-              27 Sites Secured
+              {TOTAL_CLIENTS} Sites Secured
             </span>
             <span className="sr-overview__badge">
               <CheckCircle2 style={{ width: "0.85rem", height: "0.85rem" }} />
-              14 Towns Covered
+              {TOTAL_TOWNS} Towns Covered
             </span>
           </div>
         </Reveal>
@@ -134,31 +145,38 @@ const SERVICES = [
   {
     icon: ShieldCheck,
     title: "Day & Night Guarding",
+    imageId: 11,
     text: "Vetted, uniformed officers providing continuous static and patrol coverage tailored to your site's risk profile.",
   },
   {
     icon: Bell,
     title: "Alarm Systems",
+    imageId: 13,
     text: "Installation and monitoring of intrusion alarm systems with rapid-response protocols for triggered events.",
   },
   {
     icon: Flame,
     title: "Fire Extinguishers",
+    imageId: 4,
     text: "Supply, servicing, and compliance checks for fire suppression equipment across commercial and residential sites.",
   },
   {
     icon: Dog,
     title: "Canine (Dog) Unit",
+    imageId: 3,
     text: "Trained security dogs and handlers deployed for perimeter patrol, detection, and deterrence.",
   },
   {
     icon: Users,
     title: "VIP Protection",
+    imageId: 8,
+    fit: "contain", // portrait photo — show it uncropped
     text: "Close-protection officers trained in executive and personal security for individuals and events.",
   },
   {
     icon: Radio,
     title: "CCTV Surveillance",
+    imageId: 14,
     text: "Camera installation, remote monitoring, and footage management to keep every corner of your site visible.",
   },
 ];
@@ -182,22 +200,51 @@ const Services = () => (
         </p>
       </Reveal>
 
-      <div className="sr-card-grid sr-card-grid--5">
+      <div className="sr-service-list">
         {SERVICES.map((service, index) => {
           const Icon = service.icon;
+          const image = IMAGES[service.imageId];
           return (
-            <Reveal key={service.title} delay={index * 0.08}>
-              <div className="sr-glass sr-service-card">
-                <div className="sr-glass__glow" aria-hidden="true" />
-                <div className="sr-service-card__icon">
-                  <Icon aria-hidden="true" />
+            <Reveal key={service.title}>
+              <article
+                className={
+                  "sr-service-row" +
+                  (index % 2 === 1 ? " sr-service-row--reverse" : "")
+                }
+              >
+                <div
+                  className={
+                    "sr-service-row__media" +
+                    (service.fit === "contain"
+                      ? " sr-service-row__media--contain"
+                      : "")
+                  }
+                  style={
+                    service.fit === "contain" && image
+                      ? { "--sr-media-bg": `url("${image}")` }
+                      : undefined
+                  }
+                >
+                  {image && (
+                    <img
+                      src={image}
+                      alt={`${service.title} — Spears Resilience Systems`}
+                      loading="lazy"
+                      className="sr-service-row__img"
+                    />
+                  )}
                 </div>
-                <h3 className="sr-service-card__title">{service.title}</h3>
-                <p className="sr-service-card__text">{service.text}</p>
-                <span className="sr-service-card__index">
-                  SVC-{String(index + 1).padStart(2, "0")}
-                </span>
-              </div>
+                <div className="sr-service-row__body">
+                  <div className="sr-service-card__icon">
+                    <Icon aria-hidden="true" />
+                  </div>
+                  <span className="sr-service-card__index">
+                    SVC-{String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="sr-service-row__title">{service.title}</h3>
+                  <p className="sr-service-row__text">{service.text}</p>
+                </div>
+              </article>
             </Reveal>
           );
         })}
@@ -207,21 +254,22 @@ const Services = () => (
 );
 
 // ---------------------------------------------------------------------------
-// GALLERY (new section, placed directly below Services)
-// -----------------------------------------------------------------------
-// 9 image placeholders (gallery1.jpg – gallery9.jpg) in a responsive
-// grid. Each image sits in a fixed-aspect-ratio "frame" with
-// overflow:hidden so it can never bleed past its rounded corners or
-// shift surrounding layout while loading — see .sr-gallery-item__frame
-// in ClientComponent.css. Swap the `src` values below for real asset
-// paths (e.g. imported images or a CMS URL) when photography is ready.
+// GALLERY
+// Shows every registered image EXCEPT those used as dedicated service
+// images (derived from SERVICES, so reassigning a service image updates the
+// gallery automatically). Sorted by image number.
 // ---------------------------------------------------------------------------
-const GALLERY_IMAGES = [image1, image2, image3, image4, image5, image6, image7, image8, image9].map(
-  (src, index) => ({
-    src,
+const SERVICE_IMAGE_IDS = new Set(SERVICES.map((service) => service.imageId));
+
+const GALLERY_IMAGES = Object.keys(IMAGES)
+  .map(Number)
+  .filter((id) => !SERVICE_IMAGE_IDS.has(id))
+  .sort((x, y) => x - y)
+  .map((id, index) => ({
+    id,
+    src: IMAGES[id],
     alt: `Spears Resilience Systems on-site personnel and equipment — photo ${index + 1}`,
-  })
-);
+  }));
 
 const Gallery = () => (
   <section id="gallery" className="sr-section sr-section--light">
@@ -243,7 +291,7 @@ const Gallery = () => (
 
       <div className="sr-gallery-grid">
         {GALLERY_IMAGES.map((image, index) => (
-          <Reveal key={image.src} delay={index * 0.05}>
+          <Reveal key={image.id} delay={(index % 4) * 0.05}>
             <div className="sr-gallery-item__frame">
               <img
                 src={image.src}

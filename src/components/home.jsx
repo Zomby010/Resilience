@@ -2,8 +2,18 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Bell, Flame, Dog, Users, ArrowRight } from "lucide-react";
+import {
+  ShieldCheck,
+  Bell,
+  Flame,
+  Dog,
+  Users,
+  Radio,
+  ArrowRight,
+} from "lucide-react";
 
+import logoWatermark from "../images/logo-watermark.png";
+import { TOTAL_CLIENTS, TOTAL_TOWNS } from "./clientData";
 import "./ClientComponent.css";
 
 /**
@@ -72,12 +82,19 @@ const SERVICES_TICKER = [
   { label: "Fire Extinguishers", icon: Flame },
   { label: "Dog Unit", icon: Dog },
   { label: "VIP Protection", icon: Users },
+  { label: "CCTV Surveillance", icon: Radio },
 ];
 
 const Hero = () => (
   <header className="sr-hero">
     <div aria-hidden="true" className="sr-hero__bg-radial" />
     <div aria-hidden="true" className="sr-hero__scanline" />
+    {/* Decorative brand watermark — purely visual, never intercepts input. */}
+    <div
+      aria-hidden="true"
+      className="sr-hero__watermark"
+      style={{ backgroundImage: `url(${logoWatermark})` }}
+    />
     <div className="sr-hero__inner">
       <Reveal>
         <span className="sr-hero__badge">
@@ -90,8 +107,8 @@ const Hero = () => (
         </h1>
         <p className="sr-hero__lead">
           End-to-end security solutions built on modern technology and a
-          disciplined, professionally trained workforce — trusted across 27
-          client sites in 14 towns.
+          disciplined, professionally trained workforce — trusted across{" "}
+          {TOTAL_CLIENTS} client sites in {TOTAL_TOWNS} towns.
         </p>
         <div className="sr-hero__actions">
           <a href="#contact" className="sr-btn sr-btn--primary">
