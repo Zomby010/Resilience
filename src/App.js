@@ -3,7 +3,9 @@ import { MotionConfig } from "framer-motion";
 
 import Home from "./components/home.jsx";
 import About from "./components/about.jsx";
-import Values from "./components/values.jsx";
+// CSR section is switched off for now. To bring it back, uncomment this
+// import and the <Values /> line below.
+// import Values from "./components/values.jsx";
 import Stats from "./components/stats.jsx";
 import Reviews from "./components/reviews.jsx";
 import Footer from "./components/footer.jsx";
@@ -24,7 +26,7 @@ function App() {
           <Stats />
           <About />
           <Reviews />
-          <Values />
+          {/* <Values /> */}
           <Footer />
         </main>
       </div>
