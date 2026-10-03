@@ -57,10 +57,12 @@ import "./ClientComponent.css";
 // Contact constants — single source of truth for WhatsApp/email everywhere
 // they appear, so a future number/address change only has to happen here.
 // ---------------------------------------------------------------------------
-const WHATSAPP_PHONE = "254718386678"; // digits only, no "+", for wa.me links
+const WHATSAPP_PHONE = "254702915154"; // digits only, no "+", for wa.me links
 
-const PHONE_DISPLAY = "+254 718 386 678";
-const PHONE_HREF = "tel:+254718386678";
+const PHONE_DISPLAY = "+254 702 915 154";
+const PHONE_HREF = "tel:+254702915154";
+
+const OFFICIAL_EMAIL = "spearsresiliencesystem@gmail.com";
 
 const GENERAL_WHATSAPP_MESSAGE =
   "Hello Spears Resilience Systems, I would like to inquire about your services.";
@@ -661,6 +663,9 @@ const SiteFooter = () => (
         <div>Technology Road, next to Kisumu Polytechnic</div>
         <div>
           <a href={PHONE_HREF}>{PHONE_DISPLAY}</a>
+        </div>
+        <div>
+          <a href={`mailto:${OFFICIAL_EMAIL}`}>{OFFICIAL_EMAIL}</a>
         </div>
       </address>
       <div className="sr-footer__follow">
