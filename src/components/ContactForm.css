@@ -283,3 +283,11 @@
     animation-duration: 1.4s;
   }
 }
+/* Honeypot field: off-screen rather than display:none so bots still fill it. */
+.form-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

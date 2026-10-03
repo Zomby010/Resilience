@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# environment files (EmailJS keys etc.)
+.env
+.env.local

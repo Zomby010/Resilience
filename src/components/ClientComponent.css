@@ -483,9 +483,20 @@
   transform: translateX(-50%) scaleX(1);
 }
 
+@media (max-width: 480px) {
+  .sr-nav__scroll {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .sr-nav__link {
+    letter-spacing: 0.03em;
+    padding: 0.95rem 0.15rem;
+    font-size: 0.7rem;
+  }
+}
+
 @media (min-width: 768px) {
   .sr-nav__link {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     padding: 1.15rem 1.25rem;
   }
 }
@@ -1141,480 +1152,6 @@
 }
 
 /* =======================================================================
-   CLIENT REGISTRY (signature section)
-   REDESIGNED: the old layout was a single-column "log" table — a header
-   row plus stacked numbered rows (CLIENT-001, CLIENT-002...) grouped
-   under plain region labels. That's replaced below with a two-tier
-   dashboard grid: an outer responsive grid of glassmorphic region
-   cards, each containing an inner grid of unnumbered client cards.
-======================================================================= */
-.sr-registry {
-  position: relative;
-}
-
-.sr-registry__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.1rem;
-  margin-top: 2rem;
-}
-
-.sr-registry__meta-chip {
-  font-family: var(--sr-font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  color: var(--sr-silver);
-  border: 1px solid rgba(203, 213, 225, 0.3);
-  border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.sr-registry__meta-chip strong {
-  color: var(--sr-gold);
-  margin-right: 0.3rem;
-}
-
-/* ---- Prominent stat cards: "27 Active Sites" / "7 Regions Logged" -
-   Scoped as a modifier on the existing chip so any other page reusing
-   the plain .sr-registry__meta-chip class is unaffected. ------------- */
-.sr-registry__meta-chip--stat {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
-  padding: 1.6rem 2.1rem 1.5rem;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  background: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.09),
-    rgba(255, 255, 255, 0.02)
-  );
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 20px 45px -18px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 34px -8px rgba(245, 158, 11, 0.28);
-  transition: transform 0.35s ease, box-shadow 0.35s ease,
-    border-color 0.35s ease;
-}
-
-.sr-registry__meta-chip--stat:hover {
-  transform: translateY(-6px);
-  border-color: rgba(245, 158, 11, 0.65);
-  box-shadow: 0 32px 64px -18px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 48px -6px rgba(245, 158, 11, 0.42);
-}
-
-.sr-registry__meta-chip--stat .sr-registry__meta-chip__value {
-  display: block;
-  font-family: var(--sr-font-display);
-  font-size: 2.75rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: var(--sr-white);
-  margin: 0 0 0.4rem;
-  text-shadow: 0 0 26px rgba(245, 158, 11, 0.45);
-  font-variant-numeric: tabular-nums;
-}
-
-@media (min-width: 640px) {
-  .sr-registry__meta-chip--stat .sr-registry__meta-chip__value {
-    font-size: 3.25rem;
-  }
-}
-
-.sr-registry__meta-chip--stat .sr-registry__meta-chip__label {
-  font-family: var(--sr-font-mono);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* Subtle pulsing accent dot, top-right corner of each stat card */
-.sr-registry__meta-chip--stat .sr-registry__meta-chip__pulse {
-  position: absolute;
-  top: 1.15rem;
-  right: 1.15rem;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--sr-gold);
-  animation: sr-stat-pulse 2.4s ease-out infinite;
-}
-
-@keyframes sr-stat-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
-  }
-  70% {
-    box-shadow: 0 0 0 14px rgba(245, 158, 11, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-  }
-}
-
-/* Slow diagonal sheen sweep for a "premium security tech" glass feel */
-.sr-registry__meta-chip--stat::after {
-  content: "";
-  position: absolute;
-  inset: -40% -20%;
-  background: linear-gradient(
-    120deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 60%
-  );
-  transform: translateX(-120%);
-  animation: sr-stat-sheen 5.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes sr-stat-sheen {
-  0%,
-  45% {
-    transform: translateX(-120%);
-  }
-  60%,
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-@media (max-width: 480px) {
-  .sr-registry__meta-chip--stat {
-    flex: 1 1 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sr-registry__meta-chip--stat::after,
-  .sr-registry__meta-chip--stat .sr-registry__meta-chip__pulse {
-    animation: none;
-  }
-}
-
-/* ---- Outer/parent grid: one glassmorphic card per region --------- */
-.sr-registry-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  margin-top: 2.75rem;
-  align-items: start;
-}
-
-@media (min-width: 640px) {
-  .sr-registry-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .sr-registry-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Region card reuses .sr-glass for the frosted background, rounded
-   corners, border, shadow, and hover-lift animation — kept consistent
-   with every other card on the site — plus its own layout rules. */
-.sr-region-card {
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Darker, glossy glass override — scoped to region cards inside the
-   registry grid so the base .sr-glass class (also used by lighter
-   sections like Gallery/Services) keeps its original look. */
-.sr-registry-grid .sr-region-card {
-  padding: 2rem 1.85rem 1.9rem;
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(20, 1, 2, 0.4) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 26px 58px -22px rgba(0, 0, 0, 0.7),
-    0 3px 12px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-
-.sr-registry-grid .sr-region-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 1.6rem;
-  right: 1.6rem;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--sr-gold), transparent);
-  opacity: 0.75;
-}
-
-.sr-registry-grid .sr-region-card:hover {
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 36px 72px -22px rgba(0, 0, 0, 0.8),
-    0 4px 18px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09);
-}
-
-.sr-region-card__header {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding-bottom: 1.1rem;
-  margin-bottom: 1.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.sr-region-card__icon {
-  flex: none;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--sr-red), var(--sr-crimson));
-  box-shadow: 0 8px 20px -6px rgba(209, 0, 18, 0.5);
-}
-
-.sr-region-card__icon svg {
-  width: 1.1rem;
-  height: 1.1rem;
-  color: var(--sr-white);
-}
-
-.sr-region-card__title {
-  flex: 1;
-  font-family: var(--sr-font-display);
-  text-transform: uppercase;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-  color: var(--sr-white);
-  margin: 0;
-}
-
-.sr-region-card__count {
-  flex: none;
-  font-family: var(--sr-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.05em;
-  color: var(--sr-white);
-  background: var(--sr-red);
-  padding: 0.3rem 0.65rem;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-/* ---- Inner/child grid: unnumbered client cards -------------------- */
-.sr-region-card__clients {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-@media (min-width: 480px) {
-  .sr-region-card__clients {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.sr-client-chip {
-  position: relative;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.07),
-    rgba(255, 255, 255, 0.015)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  padding: 1rem 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  transition: transform 0.3s ease, background-color 0.3s ease,
-    border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sr-client-chip:hover {
-  transform: translateY(-4px);
-  background: linear-gradient(
-    160deg,
-    rgba(245, 158, 11, 0.14),
-    rgba(245, 158, 11, 0.03)
-  );
-  border-color: rgba(245, 158, 11, 0.45);
-  box-shadow: 0 18px 36px -14px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-
-.sr-client-chip__name {
-  font-size: 0.88rem;
-  font-weight: 600;
-  line-height: 1.45;
-  color: var(--sr-white);
-}
-
-.sr-client-chip__loc {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-family: var(--sr-font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  color: #dbe4ee;
-}
-
-.sr-client-chip__loc svg {
-  width: 0.75rem;
-  height: 0.75rem;
-  color: var(--sr-gold);
-}
-
-/* =======================================================================
-   MOBILE CLIENT REGISTRY (<=768px only)
-   Compact, tappable region list replacing the full glassmorphic grid on
-   phones. Rendered only when the Client component's isMobile hook is
-   true, so nothing here ever reaches desktop viewports — these rules
-   reuse existing tokens/classes (.sr-glass, .sr-client-chip,
-   .sr-region-card__icon, .sr-region-card__count) so the visual language
-   matches the desktop registry exactly, just in a denser layout.
-======================================================================= */
-.sr-mobile-registry {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 2.75rem;
-}
-
-.sr-mobile-region {
-  position: relative;
-}
-
-/* Tappable row — glassmorphic surface, darker than before for stronger
-   contrast against the light tooltip panel it reveals underneath. */
-.sr-mobile-region__row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 1.1rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(20, 1, 2, 0.72) 100%
-  );
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  font-family: var(--sr-font-body);
-  color: var(--sr-white);
-  cursor: pointer;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease,
-    background 0.25s ease;
-}
-
-.sr-mobile-region__row:focus-visible {
-  outline: 2px solid var(--sr-gold);
-  outline-offset: 2px;
-}
-
-.sr-mobile-region__row--open {
-  border-color: rgba(245, 158, 11, 0.45);
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(20, 1, 2, 0.85) 100%
-  );
-  box-shadow: 0 26px 56px -20px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.sr-mobile-region__icon {
-  /* Reuses .sr-region-card__icon's red gradient badge; only the margins
-     differ since this sits inline in a row rather than a card header. */
-  margin: 0;
-}
-
-.sr-mobile-region__name {
-  flex: 1;
-  text-align: left;
-  font-family: var(--sr-font-display);
-  text-transform: uppercase;
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-}
-
-/* Tooltip/popover panel — glassmorphic card: translucent blurred surface,
-   its own border + shadow framing the whole panel (not just the chips
-   inside it), and more breathing room around/between entries. */
-.sr-mobile-region__tooltip {
-  overflow: hidden;
-}
-
-.sr-mobile-region__tooltip-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.95rem;
-  margin-top: 0.6rem;
-  padding: 1.25rem 1.1rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.03)
-  );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-/* Individual client entries inside the tooltip: their own border + shadow
-   on top of the panel's, extra padding, and lighter (higher-contrast)
-   text than the desktop chips for easier reading in the compact popover. */
-.sr-mobile-region__client {
-  padding: 1rem 1.15rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.sr-mobile-region__client .sr-client-chip__name {
-  color: rgba(255, 255, 255, 0.94);
-  font-weight: 500;
-}
-
-.sr-mobile-region__client .sr-client-chip__loc {
-  color: rgba(219, 228, 238, 0.9);
-}
-
-/* =======================================================================
    CONTACT
 ======================================================================= */
 .sr-contact__grid {
@@ -1624,9 +1161,15 @@
   margin-top: 2.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .sr-contact__grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .sr-contact__grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -2100,4 +1643,411 @@
 .sr-fade--visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* =======================================================================
+   ACCESSIBILITY + ADDED COMPONENTS
+======================================================================= */
+.sr-skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--sr-black);
+  color: var(--sr-white);
+  border-radius: 0.375rem;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.sr-skip-link:focus {
+  top: 0.75rem;
+  outline: 2px solid var(--sr-gold);
+  outline-offset: 2px;
+}
+
+.sr-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Let visitors pause the marquee by hovering it */
+.sr-hero__ticker:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sr-hero__ticker {
+    animation: none;
+  }
+}
+
+/* Service "Request a quote" link */
+.sr-service-row__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+  font-weight: 600;
+  color: var(--sr-red);
+  text-decoration: none;
+}
+.sr-service-row__cta svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.2s ease;
+}
+.sr-service-row__cta:hover svg,
+.sr-service-row__cta:focus-visible svg {
+  transform: translateX(3px);
+}
+.sr-service-row__cta:focus-visible {
+  outline: 2px solid var(--sr-red);
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* Floating WhatsApp button */
+.sr-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+.sr-fab svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.sr-fab:hover {
+  transform: scale(1.06);
+}
+.sr-fab:focus-visible {
+  outline: 3px solid var(--sr-gold);
+  outline-offset: 3px;
+}
+
+/* Site footer */
+.sr-footer {
+  background: var(--sr-black);
+  color: var(--sr-silver);
+  padding: 2.5rem 1.5rem 1.5rem;
+  font-size: 0.95rem;
+}
+.sr-footer__inner {
+  max-width: 78rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .sr-footer__inner {
+    grid-template-columns: 1.1fr 1.4fr 1.1fr 0.8fr;
+  }
+}
+.sr-footer strong {
+  color: var(--sr-white);
+}
+.sr-footer p {
+  margin: 0.25rem 0 0;
+}
+.sr-footer address {
+  font-style: normal;
+  line-height: 1.7;
+}
+.sr-footer a {
+  color: var(--sr-silver);
+}
+.sr-footer a:hover,
+.sr-footer a:focus-visible {
+  color: var(--sr-white);
+}
+.sr-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+.sr-footer__legal {
+  max-width: 78rem;
+  margin: 1.75rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(203, 213, 225, 0.15);
+  font-size: 0.85rem;
+}
+
+.contact-form-wrapper {
+  scroll-margin-top: 5rem;
+}
+
+
+/* =======================================================================
+   STATS BAND
+======================================================================= */
+.sr-stats {
+  background: linear-gradient(160deg, var(--sr-black) 0%, var(--sr-slate) 100%);
+  border-top: 3px solid var(--sr-red);
+  padding: 1.75rem 1rem;
+}
+.sr-stats__inner {
+  max-width: 78rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.sr-stats__item {
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+}
+.sr-stats__item + .sr-stats__item {
+  border-left: 1px solid rgba(203, 213, 225, 0.2);
+}
+.sr-stats__value {
+  font-family: var(--sr-font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 6.5vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--sr-white);
+  font-variant-numeric: tabular-nums;
+}
+.sr-stats__suffix {
+  color: var(--sr-gold);
+  font-size: 0.6em;
+}
+.sr-stats__label {
+  margin-top: 0.25rem;
+  font-family: var(--sr-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sr-silver);
+}
+@media (min-width: 640px) {
+  .sr-stats {
+    padding: 2.25rem 1.5rem;
+  }
+  .sr-stats__label {
+    font-size: 0.85rem;
+  }
+}
+
+/* =======================================================================
+   REVIEWS
+======================================================================= */
+.sr-star {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: #cbd5e1;
+  fill: transparent;
+}
+.sr-star--on {
+  color: var(--sr-gold);
+  fill: var(--sr-gold);
+}
+.sr-stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+.sr-rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.sr-rating-summary__score {
+  font-family: var(--sr-font-display);
+  font-weight: 700;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--sr-black);
+}
+.sr-rating-summary__count {
+  margin-top: 0.25rem;
+  color: var(--sr-charcoal);
+  font-size: 0.95rem;
+}
+.sr-reviews__layout {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+  align-items: start;
+}
+@media (min-width: 960px) {
+  .sr-reviews__layout {
+    grid-template-columns: 1.3fr 1fr;
+  }
+}
+.sr-reviews__list {
+  display: grid;
+  gap: 1.25rem;
+}
+@media (min-width: 640px) and (max-width: 959px) {
+  .sr-reviews__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.sr-review-card {
+  margin: 0;
+  padding: 1.5rem;
+  height: 100%;
+}
+.sr-review-card__text {
+  margin: 0.9rem 0 1rem;
+  line-height: 1.7;
+  color: var(--sr-charcoal);
+}
+.sr-review-card__author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  color: var(--sr-charcoal);
+}
+.sr-review-card__author strong {
+  color: var(--sr-black);
+}
+.sr-review-form {
+  position: relative;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.sr-review-form__title {
+  margin: 0;
+  font-family: var(--sr-font-display);
+  font-size: 1.4rem;
+  color: var(--sr-black);
+}
+.sr-review-form__note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--sr-charcoal);
+}
+.sr-review-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.sr-review-form__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--sr-black);
+}
+.sr-review-form input[type="text"],
+.sr-review-form input[type="email"],
+.sr-review-form textarea {
+  font: inherit;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--sr-silver);
+  border-radius: 0.5rem;
+  background: var(--sr-white);
+  color: var(--sr-black);
+}
+.sr-review-form input:focus-visible,
+.sr-review-form textarea:focus-visible {
+  outline: 2px solid var(--sr-red);
+  outline-offset: 1px;
+}
+.sr-review-form [aria-invalid="true"] {
+  border-color: var(--sr-red);
+}
+.sr-review-form__error {
+  font-size: 0.85rem;
+  color: #b91c1c;
+}
+.sr-review-form__status {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+}
+.sr-review-form__status--ok {
+  background: #e9f8ee;
+  color: #1e7e45;
+}
+.sr-review-form__status--err {
+  background: #fdecec;
+  color: #b91c1c;
+}
+.sr-star-input {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+.sr-star-input__label {
+  position: relative;
+  cursor: pointer;
+  line-height: 0;
+  padding: 0.15rem;
+}
+.sr-star-input__label .sr-star {
+  width: 2rem;
+  height: 2rem;
+}
+.sr-star-input__label:focus-within {
+  outline: 2px solid var(--sr-red);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* =======================================================================
+   SOCIAL LINKS
+======================================================================= */
+.sr-footer__follow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.sr-footer__follow-label {
+  color: var(--sr-white);
+  font-weight: 600;
+}
+.sr-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sr-social__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(203, 213, 225, 0.35);
+  color: var(--sr-silver);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.sr-social__link svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.sr-social__link:hover,
+.sr-social__link:focus-visible {
+  background: var(--sr-red);
+  border-color: var(--sr-red);
+  color: var(--sr-white);
+}
+.sr-social__link:focus-visible {
+  outline: 2px solid var(--sr-gold);
+  outline-offset: 2px;
 }

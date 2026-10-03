@@ -1,27 +1,35 @@
-import React, {Component} from "react";
+import React from "react";
+import { MotionConfig } from "framer-motion";
 
 import Home from "./components/home.jsx";
 import About from "./components/about.jsx";
 import Values from "./components/values.jsx";
-import Client from "./components/client.jsx";
+import Stats from "./components/stats.jsx";
+import Reviews from "./components/reviews.jsx";
 import Footer from "./components/footer.jsx";
-import Contact from "./components/contactForm.jsx";
-class App extends Component {
-  render() {
-    return (
+
+// Order follows the buyer's journey: headline numbers, what we do, client
+// reviews, values, then contact (Footer renders the contact cards, form and CTA).
+function App() {
+  return (
+    // reducedMotion="user" makes every framer-motion reveal respect the
+    // visitor's "reduce motion" operating-system setting.
+    <MotionConfig reducedMotion="user">
       <div className="App">
-        {/* <AboutSection /> */}
-        {/* <Clients /> */}
+        <a href="#main" className="sr-skip-link">
+          Skip to main content
+        </a>
         <Home />
-        <About /> 
-        <Values />
-        <Client />
-        <Footer />
-       <Contact /> 
+        <main id="main">
+          <Stats />
+          <About />
+          <Reviews />
+          <Values />
+          <Footer />
+        </main>
       </div>
-    );
-  }
+    </MotionConfig>
+  );
 }
 
 export default App;
-

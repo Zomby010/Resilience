@@ -12,10 +12,11 @@ import {
   Dog,
   Users,
   Radio,
+  ArrowRight,
 } from "lucide-react";
 
 import "./ClientComponent.css";
-import { TOTAL_CLIENTS, TOTAL_TOWNS } from "./clientData";
+import { TOTAL_CLIENTS, COUNTIES_COVERED } from "./clientData";
 
 // ---------------------------------------------------------------------------
 // IMAGE REGISTRY
@@ -88,8 +89,8 @@ const Overview = () => (
           <p className="sr-overview__copy" style={{ marginTop: "1rem" }}>
             Our footprint spans hospitality, education, retail, faith-based
             institutions, and corporate clients across Kenya —
-            currently {TOTAL_CLIENTS} active sites across {TOTAL_TOWNS} towns, from
-            Kisumu to Nyamira, Siaya to Butere and beyond.
+            currently {TOTAL_CLIENTS} active sites across {COUNTIES_COVERED}{" "}
+            counties, from Kisumu to Nyamira, Siaya to Butere and beyond.
           </p>
           <div className="sr-overview__badges">
             <span className="sr-overview__badge">
@@ -98,7 +99,7 @@ const Overview = () => (
             </span>
             <span className="sr-overview__badge">
               <CheckCircle2 style={{ width: "0.85rem", height: "0.85rem" }} />
-              {TOTAL_TOWNS} Towns Covered
+              {COUNTIES_COVERED} Counties Covered
             </span>
           </div>
         </Reveal>
@@ -208,11 +209,15 @@ const Services = () => (
                   <div className="sr-service-card__icon">
                     <Icon aria-hidden="true" />
                   </div>
-                  <span className="sr-service-card__index">
-                    SVC-{String(index + 1).padStart(2, "0")}
-                  </span>
                   <h3 className="sr-service-row__title">{service.title}</h3>
                   <p className="sr-service-row__text">{service.text}</p>
+                  <a href="#contact" className="sr-service-row__cta">
+                    Request a quote
+                    <span className="sr-visually-hidden">
+                      {" "}for {service.title}
+                    </span>
+                    <ArrowRight aria-hidden="true" />
+                  </a>
                 </div>
               </article>
             </Reveal>
@@ -231,6 +236,10 @@ const Services = () => (
 // ---------------------------------------------------------------------------
 const SERVICE_IMAGE_IDS = new Set(SERVICES.map((service) => service.imageId));
 
+const GALLERY_COUNT = Object.keys(IMAGES).filter(
+  (id) => !SERVICE_IMAGE_IDS.has(Number(id))
+).length;
+
 const GALLERY_IMAGES = Object.keys(IMAGES)
   .map(Number)
   .filter((id) => !SERVICE_IMAGE_IDS.has(id))
@@ -238,7 +247,7 @@ const GALLERY_IMAGES = Object.keys(IMAGES)
   .map((id, index) => ({
     id,
     src: IMAGES[id],
-    alt: `Spears Resilience Systems on-site personnel and equipment — photo ${index + 1}`,
+    alt: `Spears Resilience Systems security operations on site (photo ${index + 1} of ${GALLERY_COUNT})`,
   }));
 
 const Gallery = () => (

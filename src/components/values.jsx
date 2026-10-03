@@ -58,7 +58,7 @@ const CSR_ITEMS = [
   },
   {
     title: "Business Ethics & Integrity",
-    text: "We will deal with our business partners and employees in an honest and honourable manner at all times. Quality and Compliance.",
+    text: "We will deal with our business partners and employees in an honest and honourable manner at all times, and we are committed to quality and compliance in everything we do.",
   },
 ];
 
@@ -68,7 +68,7 @@ const Values = () => (
       <Reveal>
         <span className="sr-eyebrow">
           <span className="sr-eyebrow__dot" aria-hidden="true" />
-          Corporate Social Responsibility
+          Our Values
         </span>
         <h2 className="sr-heading">
           Corporate Social <span className="sr-heading__accent">Responsibility</span>

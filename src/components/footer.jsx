@@ -3,14 +3,24 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  FaFacebookF,
+  FaInstagram,
+  FaXTwitter,
+  FaLinkedinIn,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa6";
+import {
   Mail,
   MapPin,
   ArrowRight,
   MessageCircle,
   X,
+  Phone,
   ShieldCheck,
 } from "lucide-react";
 
+import ContactForm from "./contactForm.jsx";
 import { publishServiceInquiry } from "./contactFormBridge";
 import "./ClientComponent.css";
 
@@ -49,6 +59,9 @@ import "./ClientComponent.css";
 // ---------------------------------------------------------------------------
 const WHATSAPP_PHONE = "254718386678"; // digits only, no "+", for wa.me links
 
+const PHONE_DISPLAY = "+254 718 386 678";
+const PHONE_HREF = "tel:+254718386678";
+
 const GENERAL_WHATSAPP_MESSAGE =
   "Hello Spears Resilience Systems, I would like to inquire about your services.";
 
@@ -68,11 +81,11 @@ const GENERAL_WHATSAPP_LINK = buildWhatsappLink(
 // OFFICE ADDRESS — shown only inside the location popup.
 // ---------------------------------------------------------------------------
 const OFFICE_ADDRESS_LINES = [
-  "P.O. Box.6053.(40.03).Kondele, Kisumu",
+  "P.O. Box 6053-40103, Kondele, Kisumu",
   "",
-  "OUR OFFICE,",
-  "TECHNOLOGY ROAD NEXT TO KISUMU POLYTECHNIC,",
-  "KISUMU, KENYA",
+  "Our Office:",
+  "Technology Road, next to Kisumu Polytechnic,",
+  "Kisumu, Kenya",
 ];
 
 // ---------------------------------------------------------------------------
@@ -147,8 +160,14 @@ const scrollToContactForm = () => {
 
   // Wait for the smooth-scroll to roughly finish before stealing focus,
   // so the browser doesn't jump the viewport a second time on focus.
+  // Focus the first field still empty (name/email may be pre-filled by the
+  // service modal), falling back to the name field.
   window.setTimeout(() => {
-    document.getElementById("user_name")?.focus({ preventScroll: true });
+    const fields = ["user_name", "user_email", "message"]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    const target = fields.find((el) => !el.value) || fields[0];
+    target?.focus({ preventScroll: true });
   }, 500);
 };
 
@@ -177,8 +196,35 @@ const ModalShell = ({ isOpen, onClose, titleId, children, className = "" }) => {
   useEffect(() => {
     if (!isOpen) return;
 
+    // Remember what opened the dialog so focus can be handed back on close.
+    const opener = document.activeElement;
+    const panel = panelRef.current;
+
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+
+      // Keep Tab / Shift+Tab cycling inside the dialog.
+      const focusable = panelRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === panelRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     panelRef.current?.focus();
@@ -190,6 +236,16 @@ const ModalShell = ({ isOpen, onClose, titleId, children, className = "" }) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      // Hand focus back to the opener unless it was moved on purpose
+      // (e.g. to the contact form after "Continue by Email").
+      if (
+        opener &&
+        typeof opener.focus === "function" &&
+        (document.activeElement === document.body ||
+          panel?.contains(document.activeElement))
+      ) {
+        opener.focus({ preventScroll: true });
+      }
     };
   }, [isOpen, onClose]);
 
@@ -256,6 +312,8 @@ const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
   if (!service) return null;
 
   const isValid = fullName.trim().length > 1;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailValid = emailPattern.test(email.trim());
 
   const buildWhatsapp = () => {
     const message = fullName.trim()
@@ -268,7 +326,9 @@ const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
   };
 
   const handleContinue = (channel) => {
-    if (!isValid) {
+    // WhatsApp only needs a name; the email route also needs a valid email
+    // because the contact form it hands off to requires one.
+    if (!isValid || (channel === "email" && !isEmailValid)) {
       setTouched(true);
       return;
     }
@@ -337,9 +397,19 @@ const ServiceInquiryModal = ({ service, isOpen, onClose }) => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com (optional)"
+            placeholder="you@example.com (needed for email only)"
             autoComplete="email"
           />
+          {touched && email.trim() !== "" && !isEmailValid && (
+            <span className="sr-modal__error">
+              Please enter a valid email address.
+            </span>
+          )}
+          {touched && isValid && email.trim() === "" && (
+            <span className="sr-modal__error">
+              Add your email to continue by email, or choose WhatsApp.
+            </span>
+          )}
         </div>
       </div>
 
@@ -470,6 +540,21 @@ const Contact = ({ onSelectService, onOpenLocation }) => (
             </div>
           </a>
         </Reveal>
+        <Reveal delay={0.08}>
+          <a
+            href={PHONE_HREF}
+            onClick={() => trackContactClick("phone_card")}
+            className="sr-glass sr-contact-card"
+          >
+            <div className="sr-contact-card__icon">
+              <Phone aria-hidden="true" />
+            </div>
+            <div>
+              <div className="sr-contact-card__label">Phone</div>
+              <div className="sr-contact-card__value">{PHONE_DISPLAY}</div>
+            </div>
+          </a>
+        </Reveal>
         <Reveal delay={0.1}>
           {/*
             Single Email entry point for general contact. Rather than
@@ -533,18 +618,71 @@ const FinalCta = () => (
       <Reveal>
         <h2 className="sr-cta__heading">Ready To Secure Your Site?</h2>
         <p className="sr-cta__text">
-          Pick a service above or reach out below — we'll take it from
-          there.
+          Pick a service, send us a message, or chat on WhatsApp — we'll
+          take it from there.
         </p>
         <div className="sr-cta__actions">
-          <a href="#contact" className="sr-btn sr-btn--primary">
-            Talk To Our Team
+          <a href={PHONE_HREF} className="sr-btn sr-btn--primary">
+            Call {PHONE_DISPLAY}
             <ArrowRight className="sr-btn__icon" aria-hidden="true" />
           </a>
         </div>
       </Reveal>
     </div>
   </section>
+);
+
+// ---------------------------------------------------------------------------
+// SITE FOOTER — always-visible contact details and copyright.
+// ---------------------------------------------------------------------------
+const SOCIAL_LINKS = [
+  { label: "Facebook", Icon: FaFacebookF },
+  { label: "Instagram", Icon: FaInstagram },
+  { label: "X (Twitter)", Icon: FaXTwitter },
+  { label: "LinkedIn", Icon: FaLinkedinIn },
+  { label: "WhatsApp", Icon: FaWhatsapp },
+  { label: "YouTube", Icon: FaYoutube },
+];
+
+const SiteFooter = () => (
+  <footer className="sr-footer">
+    <div className="sr-footer__inner">
+      <div>
+        <strong>Spears Resilience Systems</strong>
+        <p>Protecting what matters.</p>
+      </div>
+      <address className="sr-footer__address">
+        <div>P.O. Box 6053-40103, Kondele, Kisumu</div>
+        <div>Technology Road, next to Kisumu Polytechnic</div>
+        <div>
+          <a href={PHONE_HREF}>{PHONE_DISPLAY}</a>
+        </div>
+      </address>
+      <div className="sr-footer__follow">
+        <span className="sr-footer__follow-label">Follow us</span>
+        <ul className="sr-social" aria-label="Social media">
+          {SOCIAL_LINKS.map(({ label, Icon }) => (
+            <li key={label}>
+              {/* PLACEHOLDER: replace href="#" with the real profile URL. */}
+              <a href="#" className="sr-social__link" aria-label={label}>
+                <Icon aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <nav aria-label="Footer" className="sr-footer__links">
+        <a href="#overview">Overview</a>
+        <a href="#services">Services</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <p className="sr-footer__legal">
+      © {new Date().getFullYear()} Spears Resilience Systems Limited. Details
+      you submit are used only to respond to your enquiry.
+    </p>
+  </footer>
 );
 
 // ---------------------------------------------------------------------------
@@ -566,7 +704,20 @@ const Footer = () => {
         onSelectService={handleSelectService}
         onOpenLocation={() => setIsLocationModalOpen(true)}
       />
+      <ContactForm />
       <FinalCta />
+      <SiteFooter />
+
+      <a
+        href={GENERAL_WHATSAPP_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sr-fab"
+        aria-label="Chat with us on WhatsApp"
+        onClick={() => trackContactClick("whatsapp_fab")}
+      >
+        <MessageCircle aria-hidden="true" />
+      </a>
 
       <ServiceInquiryModal
         service={selectedService}

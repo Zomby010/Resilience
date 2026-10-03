@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import logoWatermark from "../images/logo-watermark.png";
-import { TOTAL_CLIENTS, TOTAL_TOWNS } from "./clientData";
+import { TOTAL_CLIENTS, COUNTIES_COVERED } from "./clientData";
 import "./ClientComponent.css";
 
 /**
@@ -22,7 +22,7 @@ import "./ClientComponent.css";
  * Spears Resilience Systems — Home section.
  * Split out of the original ClientComponent.jsx. Contains the in-page
  * section nav and the hero (introduction, "Request a Consultation" and
- * "View Our Client Registry" buttons).
+ * "See Our Reach" buttons).
  * -----------------------------------------------------------------------
  */
 
@@ -57,7 +57,7 @@ const SECTION_LINKS = [
   { href: "#overview", label: "Overview" },
   { href: "#services", label: "Services" },
   { href: "#gallery", label: "Gallery" },
-  { href: "#registry", label: "Clients" },
+  { href: "#reviews", label: "Reviews" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -108,7 +108,7 @@ const Hero = () => (
         <p className="sr-hero__lead">
           End-to-end security solutions built on modern technology and a
           disciplined, professionally trained workforce — trusted across{" "}
-          {TOTAL_CLIENTS} client sites in {TOTAL_TOWNS} towns.
+          {TOTAL_CLIENTS} client sites across {COUNTIES_COVERED} counties.
         </p>
         <div className="sr-hero__actions">
           <a href="#contact" className="sr-btn sr-btn--primary">
@@ -118,8 +118,8 @@ const Hero = () => (
           {/* Restyled with the new .sr-btn--glass variant (frosted/glassmorphic)
               in place of the flat .sr-btn--ghost look, per the requested
               premium redesign of this CTA. */}
-          <a href="#registry" className="sr-btn sr-btn--glass">
-            View Our Client Registry
+          <a href="#stats" className="sr-btn sr-btn--glass">
+            See Our Reach
           </a>
         </div>
       </Reveal>

@@ -100,6 +100,14 @@ export default function ContactForm() {
     }
 
     setErrors(newErrors);
+
+    // Move focus to the first invalid field so keyboard and screen-reader
+    // users land on the problem instead of hunting for it.
+    const firstInvalid = ["user_name", "user_email", "message"].find(
+      (key) => newErrors[key]
+    );
+    if (firstInvalid) document.getElementById(firstInvalid)?.focus();
+
     // Form is valid if there are no keys in newErrors.
     return Object.keys(newErrors).length === 0;
   };
@@ -112,6 +120,13 @@ export default function ContactForm() {
 
     // Stop here if client-side validation fails.
     if (!validate()) {
+      return;
+    }
+
+    // Honeypot: real visitors never see or fill this field; bots usually do.
+    // Pretend success so the bot gets no signal, but send nothing.
+    if (formRef.current?.elements?.website?.value) {
+      setSubmitStatus("success");
       return;
     }
 
@@ -157,7 +172,7 @@ export default function ContactForm() {
       >
         <h2 className="contact-form-title">Get in touch</h2>
         <p className="contact-form-subtitle">
-          Fill out the form below and I'll get back to you as soon as possible.
+          Fill out the form below and our team will get back to you as soon as possible.
         </p>
 
         {/* Sets expectations before the visitor starts typing. Also the
@@ -179,10 +194,15 @@ export default function ContactForm() {
             onChange={handleChange}
             className={errors.user_name ? "input-error" : ""}
             placeholder="Your full name"
+            autoComplete="name"
+            aria-invalid={errors.user_name ? "true" : undefined}
+            aria-describedby={errors.user_name ? "user_name-error" : undefined}
             disabled={isSending}
           />
           {errors.user_name && (
-            <span className="error-message">{errors.user_name}</span>
+            <span id="user_name-error" className="error-message" role="alert">
+              {errors.user_name}
+            </span>
           )}
         </div>
 
@@ -197,13 +217,20 @@ export default function ContactForm() {
             onChange={handleChange}
             className={errors.user_email ? "input-error" : ""}
             placeholder="you@example.com"
+            autoComplete="email"
+            aria-invalid={errors.user_email ? "true" : undefined}
+            aria-describedby={
+              errors.user_email ? "user_email-error" : "user_email-hint"
+            }
             disabled={isSending}
           />
           {errors.user_email && (
-            <span className="error-message">{errors.user_email}</span>
+            <span id="user_email-error" className="error-message" role="alert">
+              {errors.user_email}
+            </span>
           )}
           {!errors.user_email && (
-            <span className="field-hint">
+            <span id="user_email-hint" className="field-hint">
               We'll only use this to reply to your inquiry.
             </span>
           )}
@@ -218,19 +245,35 @@ export default function ContactForm() {
             value={formData.message}
             onChange={handleChange}
             className={errors.message ? "input-error" : ""}
-            placeholder="How can I help you?"
+            placeholder="How can we help you?"
             rows="6"
+            aria-invalid={errors.message ? "true" : undefined}
+            aria-describedby={errors.message ? "message-error" : "message-hint"}
             disabled={isSending}
           />
           {errors.message && (
-            <span className="error-message">{errors.message}</span>
+            <span id="message-error" className="error-message" role="alert">
+              {errors.message}
+            </span>
           )}
           {!errors.message && (
-            <span className="field-hint">
+            <span id="message-hint" className="field-hint">
               A few sentences about the site, risk, or system you'd like
               secured helps us respond faster.
             </span>
           )}
+        </div>
+
+        {/* HONEYPOT — hidden from people and assistive tech (see .form-hp). */}
+        <div className="form-hp" aria-hidden="true">
+          <label htmlFor="website">Leave this field empty</label>
+          <input
+            type="text"
+            id="website"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
         </div>
 
         {/* SUBMIT BUTTON — disabled while sending to prevent duplicate sends */}
@@ -246,13 +289,13 @@ export default function ContactForm() {
         {/* SUCCESS / ERROR NOTIFICATIONS */}
         {submitStatus === "success" && (
           <p className="status-message status-success" role="status">
-            ✅ Your message was sent successfully. Thank you for reaching out!
+            Your message was sent successfully. Thank you for reaching out!
           </p>
         )}
         {submitStatus === "error" && (
           <p className="status-message status-error" role="alert">
-            ❌ Something went wrong while sending your message. Please try
-            again in a moment.
+            Something went wrong while sending your message. Please try again
+            in a moment, or reach us on WhatsApp.
           </p>
         )}
       </form>
