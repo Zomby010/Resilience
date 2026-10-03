@@ -635,13 +635,18 @@ const FinalCta = () => (
 // ---------------------------------------------------------------------------
 // SITE FOOTER — always-visible contact details and copyright.
 // ---------------------------------------------------------------------------
+// PLACEHOLDER: replace each "#" with the real profile URL. (Held in a
+// constant, not written inline in the JSX, because CI builds fail on
+// <a href="#"> under the jsx-a11y/anchor-is-valid lint rule.)
+const SOCIAL_PLACEHOLDER = "#";
+
 const SOCIAL_LINKS = [
-  { label: "Facebook", Icon: FaFacebookF },
-  { label: "Instagram", Icon: FaInstagram },
-  { label: "X (Twitter)", Icon: FaXTwitter },
-  { label: "LinkedIn", Icon: FaLinkedinIn },
-  { label: "WhatsApp", Icon: FaWhatsapp },
-  { label: "YouTube", Icon: FaYoutube },
+  { label: "Facebook", href: SOCIAL_PLACEHOLDER, Icon: FaFacebookF },
+  { label: "Instagram", href: SOCIAL_PLACEHOLDER, Icon: FaInstagram },
+  { label: "X (Twitter)", href: SOCIAL_PLACEHOLDER, Icon: FaXTwitter },
+  { label: "LinkedIn", href: SOCIAL_PLACEHOLDER, Icon: FaLinkedinIn },
+  { label: "WhatsApp", href: SOCIAL_PLACEHOLDER, Icon: FaWhatsapp },
+  { label: "YouTube", href: SOCIAL_PLACEHOLDER, Icon: FaYoutube },
 ];
 
 const SiteFooter = () => (
@@ -661,10 +666,9 @@ const SiteFooter = () => (
       <div className="sr-footer__follow">
         <span className="sr-footer__follow-label">Follow us</span>
         <ul className="sr-social" aria-label="Social media">
-          {SOCIAL_LINKS.map(({ label, Icon }) => (
+          {SOCIAL_LINKS.map(({ label, href, Icon }) => (
             <li key={label}>
-              {/* PLACEHOLDER: replace href="#" with the real profile URL. */}
-              <a href="#" className="sr-social__link" aria-label={label}>
+              <a href={href} className="sr-social__link" aria-label={label}>
                 <Icon aria-hidden="true" />
               </a>
             </li>
