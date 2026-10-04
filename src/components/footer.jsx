@@ -62,7 +62,7 @@ const WHATSAPP_PHONE = "254702915154"; // digits only, no "+", for wa.me links
 const PHONE_DISPLAY = "+254 702 915 154";
 const PHONE_HREF = "tel:+254702915154";
 
-const OFFICIAL_EMAIL = "spearsresiliencesystem@gmail.com";
+const OFFICIAL_EMAIL = "spearsresiliencesystems@gmail.com";
 
 const GENERAL_WHATSAPP_MESSAGE =
   "Hello Spears Resilience Systems, I would like to inquire about your services.";
