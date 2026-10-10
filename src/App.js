@@ -1,36 +1,41 @@
-import React from "react";
-import { MotionConfig } from "framer-motion";
+import React, { useState } from "react";
 
-import Home from "./components/home.jsx";
-import About from "./components/about.jsx";
-// CSR section is switched off for now. To bring it back, uncomment this
-// import and the <Values /> line below.
-// import Values from "./components/values.jsx";
-import Stats from "./components/stats.jsx";
-import Reviews from "./components/reviews.jsx";
-import Footer from "./components/footer.jsx";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Services from "./components/Services";
+import HowWeWork from "./components/HowWeWork";
+import Proof from "./components/Proof";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import SiteFooter from "./components/SiteFooter";
+import FloatingContact from "./components/FloatingContact";
+import "./styles.css";
 
-// Order follows the buyer's journey: headline numbers, what we do, client
-// reviews, values, then contact (Footer renders the contact cards, form and CTA).
+// One page, one goal: get the visitor to request a quote, call or WhatsApp.
+// Order: promise and proof (hero), what we do, why we're different (our
+// GPS-verified operations), who we protect, who we are, then contact.
 function App() {
+  // Service picked from a card's "Get a quote", pre-selected in the form.
+  const [chosenService, setChosenService] = useState("");
+
   return (
-    // reducedMotion="user" makes every framer-motion reveal respect the
-    // visitor's "reduce motion" operating-system setting.
-    <MotionConfig reducedMotion="user">
-      <div className="App">
-        <a href="#main" className="sr-skip-link">
-          Skip to main content
-        </a>
-        <Home />
-        <main id="main">
-          <Stats />
-          <About />
-          <Reviews />
-          {/* <Values /> */}
-          <Footer />
-        </main>
-      </div>
-    </MotionConfig>
+    <>
+      <a href="#main" className="skip-link">
+        Skip to main content
+      </a>
+      <Header />
+      <main id="main">
+        <span id="top" />
+        <Hero />
+        <Services onChooseService={setChosenService} />
+        <HowWeWork />
+        <Proof />
+        <About />
+        <Contact chosenService={chosenService} />
+      </main>
+      <SiteFooter />
+      <FloatingContact />
+    </>
   );
 }
 

@@ -1,0 +1,12 @@
+// Cloudflare Workers build settings. Without this file, `wrangler deploy` on
+// main auto-detects the site, but `wrangler versions upload` (used for preview
+// branches and pull requests) has nothing to go on and fails.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "resilience",
+  "compatibility_date": "2026-10-06",
+  "assets": {
+    "directory": "./build",
+    "not_found_handling": "single-page-application"
+  }
+}
