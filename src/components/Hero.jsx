@@ -9,13 +9,22 @@ const Hero = () => (
   <section className="hero" aria-labelledby="hero-title">
     <div className="hero__inner">
       <div className="hero__copy">
+        {/* Brand crest as a faint background watermark (decorative only). */}
+        <div
+          className="hero__watermark"
+          aria-hidden="true"
+          style={{ backgroundImage: "url(/images/logo-watermark.webp)" }}
+        />
         <p className="hero__eyebrow">
           <ShieldCheck aria-hidden="true" />
           Registered security provider · Kisumu, Kenya
         </p>
         <h1 id="hero-title" className="hero__title">
-          Trained guards.
-          <span> <span className="nowrap">GPS-verified</span> on your site, day and night.</span>
+          <span className="hero__slogan">Protecting what matters</span>
+          <span className="hero__promise">
+            Trained guards, <span className="nowrap">GPS-verified</span> on your
+            site, day and night.
+          </span>
         </h1>
         <p className="hero__lead">
           Guarding, alarms, CCTV, canine and VIP protection for homes,
