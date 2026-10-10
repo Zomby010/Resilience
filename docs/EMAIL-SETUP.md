@@ -59,4 +59,4 @@ Publish only real reviews from real clients, with their permission, using first 
 
 ## The company email address
 
-The site, structured data and fallback recipient use `spearsresiliencesystems@gmail.com`. The brief that started this work spelled it `spearsresiliencesystem@gmail.com` (no final "s"). Confirm which inbox is real, then make `EMAIL` in `src/siteConfig.js`, `"email"` in `public/index.html`, the address in `public/privacy.html`, `DEFAULT_TO` in `api/_lib/mail.js` and `CONTACT_TO` in Vercel all match.
+The company inbox is `spearsresiliencesystem@gmail.com` (confirmed by the owner). It is used in `EMAIL` in `src/siteConfig.js`, `"email"` in `public/index.html`, `public/privacy.html` and `DEFAULT_TO` in `api/_lib/mail.js`. Set `CONTACT_TO` in Vercel to the same address. If you keep the EmailJS fallback, also check that the EmailJS email service and template send to this inbox.

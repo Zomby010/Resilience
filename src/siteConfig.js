@@ -13,10 +13,10 @@ export const PHONE = {
   whatsapp: "254702915154", // digits only, for wa.me links
 };
 
-// NOTE: the owner's brief spelled this "spearsresiliencesystem@gmail.com"
-// (no final "s"). Confirm which inbox is real; this constant, the JSON-LD
-// in public/index.html and CONTACT_TO in Vercel must all match.
-export const EMAIL = "spearsresiliencesystems@gmail.com";
+// Company inbox (confirmed by the owner). Keep the JSON-LD in
+// public/index.html, public/privacy.html, DEFAULT_TO in api/_lib/mail.js and
+// CONTACT_TO in Vercel the same.
+export const EMAIL = "spearsresiliencesystem@gmail.com";
 
 export const ADDRESS = {
   lines: [

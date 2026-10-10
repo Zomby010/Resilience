@@ -11,7 +11,7 @@
 //   TURNSTILE_SECRET_KEY  Optional Cloudflare Turnstile secret. When set,
 //                         requests without a valid token are refused.
 
-const DEFAULT_TO = "spearsresiliencesystems@gmail.com";
+const DEFAULT_TO = "spearsresiliencesystem@gmail.com";
 const MAX_PER_WINDOW = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map(); // best-effort, per function instance
