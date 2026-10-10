@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#140102" />
     <title>Spears Resilience Systems | Security Services in Kisumu, Kenya</title>
@@ -14,17 +16,19 @@
     <meta name="robots" content="index, follow" />
     <meta property="og:url" content="https://www.spearsresiliencesystems.com/" />
     <meta property="og:locale" content="en_KE" />
-    <meta property="og:image" content="https://www.spearsresiliencesystems.com/logo.png" />
-    <meta property="og:image:alt" content="Spears Resilience Systems logo" />
+    <meta property="og:image" content="https://www.spearsresiliencesystems.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Spears Resilience Systems logo with the tagline Protecting what matters" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Spears Resilience Systems" />
     <meta property="og:title" content="Spears Resilience Systems | Protecting What Matters" />
     <meta
       property="og:description"
-      content="End-to-end security solutions: guarding, alarms, CCTV, canine unit, VIP protection and fire safety. Request a consultation today."
+      content="Trained, GPS-verified guards plus alarms, CCTV, canine unit, VIP protection and fire safety across Kenya. Get a free site assessment."
     />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:image" content="https://www.spearsresiliencesystems.com/logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://www.spearsresiliencesystems.com/og-image.jpg" />
     <meta name="twitter:title" content="Spears Resilience Systems | Protecting What Matters" />
     <meta
       name="twitter:description"
@@ -33,47 +37,66 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SecurityService",
-        "@id": "https://www.spearsresiliencesystems.com/#business",
-        "name": "Spears Resilience Systems",
-        "url": "https://www.spearsresiliencesystems.com/",
-        "logo": "https://www.spearsresiliencesystems.com/logo.png",
-        "image": "https://www.spearsresiliencesystems.com/logo.png",
-        "description": "Registered security solutions provider in Kisumu, Kenya: day and night guarding, VIP protection, alarm systems, electric fencing, CCTV surveillance, canine (dog) unit and fire extinguishers.",
-        "foundingDate": "2022-02-24",
-        "telephone": "+254702915154",
-        "email": "spearsresiliencesystems@gmail.com",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Technology Road, next to Kisumu Polytechnic",
-          "addressLocality": "Kisumu",
-          "addressRegion": "Kisumu County",
-          "postalCode": "40103",
-          "addressCountry": "KE"
-        },
-        "areaServed": { "@type": "Country", "name": "Kenya" },
-        "hasOfferCatalog": {
-          "@type": "OfferCatalog",
-          "name": "Security services",
-          "itemListElement": [
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Day and night guarding" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "VIP protection" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Alarm systems" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Electric fencing" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "CCTV surveillance" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Canine (dog) unit" } },
-            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fire extinguishers supply and servicing" } }
-          ]
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://www.spearsresiliencesystems.com/#website",
+            "name": "Spears Resilience Systems",
+            "alternateName": ["Spears Resilience", "Spears Security Kisumu"],
+            "url": "https://www.spearsresiliencesystems.com/",
+            "publisher": { "@id": "https://www.spearsresiliencesystems.com/#business" }
+          },
+          {
+            "@type": "SecurityService",
+            "@id": "https://www.spearsresiliencesystems.com/#business",
+            "name": "Spears Resilience Systems",
+            "legalName": "Spears Resilience Systems Limited",
+            "url": "https://www.spearsresiliencesystems.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.spearsresiliencesystems.com/logo-square.png",
+              "width": 512,
+              "height": 512
+            },
+            "image": "https://www.spearsresiliencesystems.com/og-image.jpg",
+            "description": "Registered security solutions provider in Kisumu, Kenya: GPS-verified day and night guarding, VIP protection, alarm systems, electric fencing, CCTV surveillance, canine (dog) unit and fire extinguishers.",
+            "foundingDate": "2022-02-24",
+            "telephone": "+254702915154",
+            "email": "spearsresiliencesystems@gmail.com",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Technology Road, next to Kisumu Polytechnic",
+              "addressLocality": "Kisumu",
+              "addressRegion": "Kisumu County",
+              "postalCode": "40103",
+              "addressCountry": "KE"
+            },
+            "areaServed": { "@type": "Country", "name": "Kenya" },
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Security services",
+              "itemListElement": [
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Day and night guarding" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "VIP protection" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Alarm systems" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Electric fencing" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "CCTV surveillance" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Canine (dog) unit" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fire extinguishers supply and servicing" } }
+              ]
+            }
+          }
+        ]
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@600&display=swap"
     />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="preload" as="image" type="image/webp" href="/images/hero-team-640.webp" imagesrcset="/images/hero-team-640.webp 640w, /images/hero-team-1080.webp 1080w" imagesizes="(min-width: 960px) 460px, 100vw" />
+    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
     <noscript>
