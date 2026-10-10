@@ -1,71 +1,45 @@
-# Getting Started with Create React App
+# Spears Resilience Systems website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Public website for Spears Resilience Systems, a registered security company in Kisumu, Kenya: https://www.spearsresiliencesystems.com
 
-## Available Scripts
+Single-page React app (Create React App) deployed on Vercel, with two Vercel Functions for email.
 
-In the project directory, you can run:
+## Run it
 
-### `npm start`
+```bash
+npm install
+npm start          # http://localhost:3000
+npm test           # tests
+npm run build      # production build in build/
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+On `npm start` there are no `/api` functions, so the forms use the EmailJS fallback if `REACT_APP_*` keys are in a local `.env`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Where things are
 
-### `npm test`
+| What | Where |
+| --- | --- |
+| Phone, email, address, stats, services, social links | `src/siteConfig.js` |
+| Page sections | `src/components/` (Header, Hero, Services, HowWeWork, Proof, About, Contact, SiteFooter) |
+| Styles | `src/styles.css` |
+| Gallery photos and their descriptions | `public/images/`, `src/galleryData.js` (originals in `assets/original-photos/`) |
+| Published reviews | `src/reviewsData.js` |
+| Email functions | `api/contact.js`, `api/review.js`, `api/_lib/mail.js` |
+| Icons, share image, search data | `public/` (`index.html` holds the meta tags and structured data) |
+| Redirects and headers | `vercel.json` |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Guides
 
-### `npm run build`
+- `docs/AUDIT.md`: what was wrong and what changed
+- `docs/SEARCH-SETUP.md`: logo in Google, site name, Search Console, removing vercel.app
+- `docs/EMAIL-SETUP.md`: Resend setup, DNS records, environment variables
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Environment variables (Vercel)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-"# Resilience" 
+| Name | Purpose |
+| --- | --- |
+| `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` | Email through Resend (server side) |
+| `TURNSTILE_SECRET_KEY`, `REACT_APP_TURNSTILE_SITE_KEY` | Optional spam check |
+| `REACT_APP_SERVICE_ID`, `REACT_APP_TEMPLATE_ID`, `REACT_APP_PUBLIC_KEY`, `REACT_APP_REVIEW_TEMPLATE_ID` | EmailJS fallback |
+| `REACT_APP_GOOGLE_REVIEWS_URL` | Optional link to Google reviews |
+| `REACT_APP_STAFF_LOGIN_URL` | Optional footer link to the Resilience BMS |
