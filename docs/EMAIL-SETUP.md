@@ -9,7 +9,24 @@ Both forms post to our own Vercel Functions:
 
 They email the office through **Resend**, with the API key kept on the server. They also check a hidden honeypot field, limit each visitor to 5 messages per 10 minutes, and can require a Cloudflare Turnstile check.
 
-**Nothing breaks before you set this up.** Until `RESEND_API_KEY` exists, the functions answer "not configured" and the site falls back to the EmailJS keys already in Vercel (`REACT_APP_SERVICE_ID`, `REACT_APP_TEMPLATE_ID`, `REACT_APP_PUBLIC_KEY`, optional `REACT_APP_REVIEW_TEMPLATE_ID`), the same way it sends today.
+If sending fails, three things happen in order:
+
+1. Until `RESEND_API_KEY` exists, the functions answer "not configured" (and log `RESEND_API_KEY missing: quote not emailed` in Vercel → Logs).
+2. The browser then tries EmailJS, if `REACT_APP_SERVICE_ID`, `REACT_APP_TEMPLATE_ID` and `REACT_APP_PUBLIC_KEY` (optional `REACT_APP_REVIEW_TEMPLATE_ID`) are set in Vercel. Because these are `REACT_APP_*` values, they are baked in at build time: redeploy after changing them.
+3. If that also fails, the visitor sees **"Send this on WhatsApp instead"** with everything they typed already filled in, plus a Call button. No request is lost, but it arrives on WhatsApp, not by email.
+
+As of the 2026-10-30 audit both forms ended at step 3: Resend was never set up, and the EmailJS fallback didn't send either.
+
+## Check your setup in one click
+
+Open https://www.spearsresiliencesystems.com/api/health. It shows `true`/`false` for each part (never the values):
+
+```json
+{ "resend": true, "contactTo": true, "contactFrom": true, "emailjsFallback": false,
+  "turnstile": false, "confirmationEmails": false, "bms": false }
+```
+
+`resend`, `contactTo` and `contactFrom` must be `true` for email to work.
 
 ## Why Resend
 
@@ -35,7 +52,21 @@ A local security firm gets far fewer than 100 enquiries a day, so the free plan 
    | `RESEND_API_KEY` | the key from step 4 |
    | `CONTACT_TO` | the company inbox (**confirm the spelling, see below**) |
    | `CONTACT_FROM` | `Spears Website <website@spearsresiliencesystems.com>` |
-6. Redeploy. Send a test quote from the site and check the inbox (and the spam folder the first time; mark it "Not spam").
+
+   Use exactly these names (not `CONTACT_TO_EMAIL` / `CONTACT_FROM_EMAIL`).
+6. Redeploy (Deployments → ⋯ on the latest → Redeploy). Environment variables only apply to new deployments.
+
+## Test it end to end
+
+1. Open `/api/health` and check `resend`, `contactTo` and `contactFrom` are `true`.
+2. On your phone, open the site, tap a service's **Get a quote**, and send a request with a real Kenyan number (e.g. `0712 345 678`) and your own email.
+3. Check the company inbox (and spam the first time; mark it "Not spam"). The phone should read `+254712345678`, and Reply should go to the email you typed.
+4. Send a review from **Leave a review** and check it arrives marked "awaiting approval".
+5. Check Vercel → Logs shows no `RESEND_API_KEY missing` or `Resend 4xx` errors.
+
+## Optional: confirmation email to the visitor
+
+Set `SEND_CONFIRMATION` to `true` in Vercel to also send visitors who gave an email a short "we've got your request, we'll call you on +254…" note. Only turn it on after the domain is verified (step 2), otherwise Resend refuses it. The callback time comes from `CALLBACK_PROMISE` in `api/_lib/mail.js` and `src/siteConfig.js`; keep both the same.
 
 Replies: each email's **Reply-To** is the visitor's email when they gave one, so pressing Reply in Gmail answers them directly. Subjects read like `New quote request: CCTV Surveillance · Kisumu · Jane W.` and `New review (5★) from Jane W., awaiting approval`.
 
