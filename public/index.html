@@ -97,6 +97,13 @@
     />
     <link rel="preload" as="image" type="image/webp" href="/images/hero-team-640.webp" imagesrcset="/images/hero-team-640.webp 640w, /images/hero-team-1080.webp 1080w" imagesizes="(min-width: 960px) 460px, 100vw" />
     <link rel="manifest" href="/manifest.json" />
+    <!-- Vercel Web Analytics: page views plus the custom events in
+         src/lib/analytics.js. Works once Analytics is enabled for the project
+         in Vercel; until then the script 404s harmlessly. -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
     <noscript>

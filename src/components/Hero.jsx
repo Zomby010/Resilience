@@ -1,9 +1,44 @@
 import React from "react";
 import { ArrowRight, MapPin, ShieldCheck } from "lucide-react";
 
-import { COMPANY, GENERAL_WHATSAPP_MESSAGE, STATS, whatsappLink } from "../siteConfig";
+import { COMPANY, GENERAL_WHATSAPP_MESSAGE, STATS, TRUST, whatsappLink } from "../siteConfig";
+import { REVIEWS } from "../reviewsData";
 import { track } from "../lib/analytics";
 import WhatsAppIcon from "./WhatsAppIcon";
+
+const TESTIMONIALS = REVIEWS.filter((r) => r.status === "approved").slice(0, 3);
+
+// Evidence under the trust numbers: licence number, client logos and short
+// testimonials. Each part shows only once the owner has added real details.
+const TrustEvidence = () => {
+  if (!TRUST.clientLogos.length && !TESTIMONIALS.length) return null;
+  return (
+    <div className="evidence">
+      {TRUST.clientLogos.length > 0 && (
+        <ul className="evidence__logos" aria-label="Some of our clients">
+          {TRUST.clientLogos.map((logo) => (
+            <li key={logo.name}>
+              <img src={logo.src} alt={logo.name} height="40" loading="lazy" />
+            </li>
+          ))}
+        </ul>
+      )}
+      {TESTIMONIALS.length > 0 && (
+        <ul className="evidence__quotes" aria-label="What clients say">
+          {TESTIMONIALS.map((t) => (
+            <li key={t.id}>
+              <blockquote>“{t.comment}”</blockquote>
+              <p>
+                <strong>{t.name}</strong>
+                {t.location && ` · ${t.location}`}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const Hero = () => (
   <section className="hero" aria-labelledby="hero-title">
@@ -17,7 +52,9 @@ const Hero = () => (
         />
         <p className="hero__eyebrow">
           <ShieldCheck aria-hidden="true" />
-          Registered security provider · Kisumu, Kenya
+          {TRUST.psraNumber
+            ? `PSRA registered, no. ${TRUST.psraNumber} · Kisumu, Kenya`
+            : "Registered security provider · Kisumu, Kenya"}
         </p>
         <h1 id="hero-title" className="hero__title">
           <span className="hero__slogan">Protecting what matters</span>
@@ -81,6 +118,8 @@ const Hero = () => (
         <strong>Day &amp; night</strong> guarding
       </li>
     </ul>
+    {STATS.asOf && <p className="trust__asof">Site and county figures as of {STATS.asOf}.</p>}
+    <TrustEvidence />
   </section>
 );
 
