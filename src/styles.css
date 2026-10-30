@@ -1101,3 +1101,21 @@ a.direct__item:hover {
     display: none;
   }
 }
+
+/* ---------- Form fallback (sending failed) ---------- */
+.form__fallback {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  background: #fff5f5;
+}
+.form__fallback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.form__fallback-actions .btn {
+  flex: 1 1 200px;
+}

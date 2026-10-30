@@ -1,10 +1,23 @@
 import React, { useRef, useState } from "react";
 import { Star, X } from "lucide-react";
 
+import { PHONE, whatsappLink } from "../siteConfig";
 import { sendEnquiry } from "../lib/sendEnquiry";
 import { track } from "../lib/analytics";
+import WhatsAppIcon from "./WhatsAppIcon";
 
 const EMPTY = { name: "", location: "", comment: "", email: "", website: "" };
+
+// The review as a WhatsApp message, for when sending fails.
+const whatsappFallbackMessage = (rating, data) =>
+  [
+    "Hello Spears Resilience Systems, here is my review of your service.",
+    `Rating: ${rating} / 5`,
+    `Name: ${data.name.trim()}`,
+    ...(data.location.trim() ? [`Location: ${data.location.trim()}`] : []),
+    "",
+    data.comment.trim(),
+  ].join("\n");
 
 // "Leave a review" button that opens a small form in a dialog. Reviews are
 // emailed to the office as pending and only published once approved.
@@ -145,7 +158,26 @@ const ReviewDialog = () => {
               {status === "sending" ? "Sending…" : "Send review"}
             </button>
             {status === "error" && (
-              <p className="form__error" role="alert">{errorText}</p>
+              <div className="form__fallback" role="alert">
+                <p className="form__error">
+                  {errorText} You can send your review on WhatsApp instead.
+                </p>
+                <div className="form__fallback-actions">
+                  <a
+                    href={whatsappLink(whatsappFallbackMessage(rating, data))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn--whatsapp"
+                    onClick={() => track("review_whatsapp_fallback", { rating })}
+                  >
+                    <WhatsAppIcon />
+                    Send this on WhatsApp instead
+                  </a>
+                  <a href={PHONE.href} className="btn btn--ghost">
+                    Call {PHONE.display}
+                  </a>
+                </div>
+              </div>
             )}
           </form>
         )}
