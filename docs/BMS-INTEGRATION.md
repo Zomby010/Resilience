@@ -1,6 +1,14 @@
 # Plan: store website leads and reviews in the Resilience BMS
 
-Status: **not built yet.** This PR could not reach the `Zomby010/Resilience_bms` repository, so reviews keep the current flow (emailed to the office, published by adding them to `src/reviewsData.js`). This is the design for a follow-up PR in both repos.
+Status: **reviews are built** (website PR and the matching Resilience_bms PR, November 2026). Leads (quote requests) are not stored in the BMS yet; the design for them below still stands.
+
+How reviews work now:
+
+1. A visitor sends a review from **Leave a review**. `api/review.js` saves it in the BMS (`POST /api/website/reviews/`) and also emails the office if Resend is set up. The visitor's request succeeds if either worked.
+2. The Secretary gets a to-do, "Website review (5★) from …", with **Approve this** / **Say no**. The Manager and Secretary also see every review under **Clients ▸ Website reviews**, where a published one can be taken off again.
+3. `GET /api/reviews` reads the published ones from the BMS (cached 10 minutes) and the Reviews section and the hero show them, with first name and initial only. Reviews in `src/reviewsData.js` still show too.
+
+Setup: on the BMS Vercel project set `WEBSITE_API_TOKEN`; on the website's Vercel project set `BMS_API_URL` (the BMS address) and `BMS_API_TOKEN` (the same value). Redeploy both, then `/api/health` shows `"bms": true`.
 
 ## Why the BMS and not a new backend
 
