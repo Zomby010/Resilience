@@ -21,7 +21,7 @@ const sendWithEmailJS = (kind, payload) => {
       : process.env.REACT_APP_TEMPLATE_ID;
   const publicKey = process.env.REACT_APP_PUBLIC_KEY;
   if (!serviceId || !templateId || !publicKey) {
-    return Promise.reject(new Error("Sending is not set up yet."));
+    return Promise.reject(new Error("We couldn't send this online just now."));
   }
   // Variable names match the existing EmailJS templates: {{user_name}},
   // {{user_email}}, {{message}}.

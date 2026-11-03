@@ -8,22 +8,22 @@ const FEATURES = [
   {
     icon: MapPinCheck,
     title: "GPS-verified guards and supervisors",
-    text: "Every guard and supervisor shares their location from their phone while on duty. The system checks it against your site and marks them on location, near (within 50 m) or off location. Our manager always has every guard's and supervisor's location on a live map and is alerted when someone leaves the site or switches location off.",
+    text: "Our manager always has every guard's and supervisor's location on a live map, and is alerted the moment someone leaves your site.",
   },
   {
     icon: ClipboardCheck,
     title: "Attendance checked on site",
-    text: "Guards sign in from your site, not from home: off-location sign-ins are refused, arrival and departure are time-stamped, lateness is flagged automatically, and supervisors approve each sign-in.",
+    text: "Guards can only sign in from your site, and every arrival and departure is time-stamped.",
   },
   {
     icon: BookLock,
     title: "Digital Occurrence Book",
-    text: "Your site's OB is digital. Handovers, patrols, visitors, deliveries and alarms are logged with the time and the officer's name. Entries can never be edited or deleted, so the record is tamper-proof and can be printed for you on request.",
+    text: "Every handover, patrol and visitor is logged in a digital OB that can't be edited or deleted, and printed for you on request.",
   },
   {
     icon: Siren,
     title: "Digital incident reports",
-    text: "Incidents are reported from the phone with a reference number, photos, action taken and police OB number. Serious incidents go straight to management, and supervisors log every site visit and welfare check.",
+    text: "Incidents are reported from the phone with photos and a reference number, and serious ones go straight to management.",
   },
 ];
 

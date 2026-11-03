@@ -10,8 +10,14 @@
 //                         "Spears Website <website@spearsresiliencesystems.com>".
 //   TURNSTILE_SECRET_KEY  Optional Cloudflare Turnstile secret. When set,
 //                         requests without a valid token are refused.
+//   SEND_CONFIRMATION     Optional. "true" also emails visitors who gave an
+//                         email a short "we've got your request" note. Needs
+//                         CONTACT_FROM on the verified domain.
 
 const DEFAULT_TO = "spearsresiliencesystem@gmail.com";
+// How soon the office calls back, as promised to visitors. Keep the same as
+// CALLBACK_PROMISE in src/siteConfig.js. Empty means "shortly".
+const CALLBACK_PROMISE = "";
 const MAX_PER_WINDOW = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map(); // best-effort, per function instance
@@ -53,7 +59,25 @@ const verifyTurnstile = async (token, ip) => {
   return Boolean(data.success);
 };
 
-const sendMail = async ({ subject, rows, replyTo }) => {
+const postToResend = async (message) => {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: process.env.CONTACT_FROM || "Spears Website <onboarding@resend.dev>",
+      ...message,
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`Resend ${res.status}: ${detail.slice(0, 300)}`);
+  }
+};
+
+const sendMail = ({ subject, rows, replyTo }) => {
   const text = rows.map(([k, v]) => `${k}: ${v || "-"}`).join("\n");
   const html =
     "<table cellpadding='6' style='font-family:Arial,sans-serif;font-size:14px'>" +
@@ -66,34 +90,48 @@ const sendMail = async ({ subject, rows, replyTo }) => {
       .join("") +
     "</table>";
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: process.env.CONTACT_FROM || "Spears Website <onboarding@resend.dev>",
-      to: [process.env.CONTACT_TO || DEFAULT_TO],
-      subject,
-      text,
-      html,
-      ...(replyTo ? { reply_to: replyTo } : {}),
-    }),
+  return postToResend({
+    to: [process.env.CONTACT_TO || DEFAULT_TO],
+    subject,
+    text,
+    html,
+    ...(replyTo ? { reply_to: replyTo } : {}),
   });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Resend ${res.status}: ${detail.slice(0, 300)}`);
-  }
+};
+
+// Optional "we've got your request" note to the visitor (SEND_CONFIRMATION).
+// The text is fixed here, never taken from the request, so the form can't be
+// used to send arbitrary mail.
+const sendConfirmation = ({ to, phone }) => {
+  const when = CALLBACK_PROMISE ? `within ${CALLBACK_PROMISE}` : "shortly";
+  const text = [
+    "Hello,",
+    "",
+    `Thank you for contacting Spears Resilience Systems. We've got your request and will call you on ${phone} ${when} to arrange your free site assessment.`,
+    "",
+    "For anything urgent, call or WhatsApp +254 702 915 154.",
+    "",
+    "Spears Resilience Systems",
+    "Technology Road, next to Kisumu Polytechnic, Kisumu",
+  ].join("\n");
+  return postToResend({
+    to: [to],
+    subject: "We've got your request · Spears Resilience Systems",
+    text,
+    reply_to: process.env.CONTACT_TO || DEFAULT_TO,
+  });
 };
 
 // Wraps a handler with the checks both endpoints share.
-const handle = (buildMail) => async (req, res) => {
+// `what` names the message in logs, e.g. "quote" or "review".
+const handle = (buildMail, what = "message") => async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed." });
   }
   if (!process.env.RESEND_API_KEY) {
+    // Shows in Vercel → Logs. The browser falls back to EmailJS, then WhatsApp.
+    console.error(`RESEND_API_KEY missing: ${what} not emailed. See docs/EMAIL-SETUP.md.`);
     return res.status(503).json({ error: "not_configured" });
   }
   const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
@@ -112,11 +150,17 @@ const handle = (buildMail) => async (req, res) => {
 
   try {
     await sendMail(mail);
-    return res.status(200).json({ ok: true });
   } catch (err) {
     console.error(err);
     return res.status(502).json({ error: "We couldn't send that just now. Please call or WhatsApp us." });
   }
+
+  if (mail.confirmation && process.env.SEND_CONFIRMATION === "true") {
+    // The office already has the request; a failed confirmation is only logged.
+    await sendConfirmation(mail.confirmation).catch((err) => console.error("Confirmation email failed:", err));
+  }
+  return res.status(200).json({ ok: true });
 };
 
 module.exports = { handle, clean, isEmail };
+

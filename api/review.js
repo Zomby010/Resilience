@@ -26,4 +26,4 @@ module.exports = handle((body) => {
       ["To publish", "Add it to src/reviewsData.js with status: \"approved\""],
     ],
   };
-});
+}, "review");

@@ -31,6 +31,24 @@ export const ADDRESS = {
 export const STATS = {
   sites: 296,
   counties: 40,
+  // TODO(owner): the month these numbers were last counted, e.g. "October 2026".
+  // Shown as "as of …" under the numbers; hidden while empty.
+  asOf: "",
+};
+
+// TODO(owner): how soon the office calls back after a quote request, e.g.
+// "2 working hours". Shown on the thank-you message. Keep the same as
+// CALLBACK_PROMISE in api/_lib/mail.js. Empty means "shortly".
+export const CALLBACK_PROMISE = "";
+
+// Trust strip under the hero. Each part is hidden while empty, so never fill
+// these with examples: only real details, and logos only with the client's
+// permission.
+export const TRUST = {
+  // TODO(owner): PSRA (Private Security Regulatory Authority) registration number.
+  psraNumber: "",
+  // TODO(owner): client logos, e.g. { name: "Client name", src: "/images/clients/name.webp" }.
+  clientLogos: [],
 };
 
 export const whatsappLink = (message) =>

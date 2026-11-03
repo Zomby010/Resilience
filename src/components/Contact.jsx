@@ -3,6 +3,7 @@ import { Clock, Mail, MapPin, Phone } from "lucide-react";
 
 import {
   ADDRESS,
+  CALLBACK_PROMISE,
   EMAIL,
   GENERAL_WHATSAPP_MESSAGE,
   PHONE,
@@ -10,6 +11,7 @@ import {
   whatsappLink,
 } from "../siteConfig";
 import { sendEnquiry } from "../lib/sendEnquiry";
+import { normaliseKenyanPhone, PHONE_ERROR } from "../lib/phone";
 import { track } from "../lib/analytics";
 import WhatsAppIcon from "./WhatsAppIcon";
 
@@ -30,6 +32,53 @@ const useTurnstile = () => {
   }, []);
 };
 
+const FIELD_ORDER = ["phone", "name", "service", "location", "email", "message"];
+
+// Checks one field; returns its error message or undefined.
+const fieldError = (name, value) => {
+  const v = (value || "").trim();
+  if (name === "name" && v.length < 2) return "Enter your name.";
+  if (name === "phone" && !normaliseKenyanPhone(v)) return v ? PHONE_ERROR : "Enter a phone number we can call.";
+  if (name === "email" && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return "Enter a valid email or leave it empty.";
+  return undefined;
+};
+
+// The visitor's request as a WhatsApp message, for when sending fails.
+const whatsappFallbackMessage = (data) =>
+  [
+    "Hello Spears Resilience Systems, I'd like a free site assessment.",
+    `Service: ${data.service || "Not sure yet"}`,
+    `Name: ${data.name.trim()}`,
+    `Phone: ${data.phone.trim()}`,
+    data.location.trim() && `Site location: ${data.location.trim()}`,
+    data.email.trim() && `Email: ${data.email.trim()}`,
+    data.message.trim() && `Message: ${data.message.trim()}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+// Moves focus to the first empty field whenever a "#contact" link (a "Get a
+// quote" button) is followed, so the visitor can start typing straight away.
+const useFocusOnQuoteLinks = (formRef) => {
+  useEffect(() => {
+    const onClick = (e) => {
+      const link = e.target.closest && e.target.closest('a[href="#contact"]');
+      if (!link) return;
+      // After React has applied any pre-selected service.
+      setTimeout(() => {
+        const form = formRef.current;
+        if (!form) return;
+        const field =
+          FIELD_ORDER.map((name) => form.elements[name]).find((el) => el && !el.value) ||
+          form.elements.phone;
+        field?.focus({ preventScroll: true });
+      }, 0);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [formRef]);
+};
+
 // The single contact section: a short quote form next to Call, WhatsApp,
 // email and the office address.
 const Contact = ({ chosenService }) => {
@@ -38,7 +87,10 @@ const Contact = ({ chosenService }) => {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [errorText, setErrorText] = useState("");
+  const [sentPhone, setSentPhone] = useState("");
+  const [announcement, setAnnouncement] = useState("");
   useTurnstile();
+  useFocusOnQuoteLinks(formRef);
 
   useEffect(() => {
     if (chosenService) {
@@ -53,18 +105,38 @@ const Contact = ({ chosenService }) => {
     if (errors[name]) setErrors((x) => ({ ...x, [name]: undefined }));
   };
 
+  // Inline check when the visitor leaves a field they have typed in.
+  const onBlur = (e) => {
+    const { name, value } = e.target;
+    if (!value.trim()) return;
+    const error = fieldError(name, value);
+    setErrors((x) => ({ ...x, [name]: error }));
+    if (error) setAnnouncement(error);
+  };
+
   const validate = () => {
     const next = {};
-    if (data.name.trim().length < 2) next.name = "Enter your name.";
-    if (data.phone.replace(/[^\d]/g, "").length < 9) next.phone = "Enter a phone number we can call.";
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
-      next.email = "Enter a valid email or leave it empty.";
-    }
+    FIELD_ORDER.forEach((name) => {
+      const error = fieldError(name, data[name]);
+      if (error) next[name] = error;
+    });
     setErrors(next);
-    const first = Object.keys(next)[0];
+    const first = FIELD_ORDER.find((name) => next[name]);
     if (first) formRef.current?.elements[first]?.focus();
     return !first;
   };
+
+  const errorProps = (name) => ({
+    "aria-invalid": !!errors[name],
+    "aria-describedby": errors[name] ? `${name}-error` : undefined,
+    onBlur,
+  });
+  const fieldErrorFor = (name) =>
+    errors[name] && (
+      <span id={`${name}-error`} className="form__error">
+        {errors[name]}
+      </span>
+    );
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -99,6 +171,7 @@ const Contact = ({ chosenService }) => {
     try {
       await sendEnquiry("contact", payload);
       track("quote_sent", { service });
+      setSentPhone(data.phone.trim());
       setStatus("sent");
       setData(EMPTY);
     } catch (err) {
@@ -172,7 +245,9 @@ const Contact = ({ chosenService }) => {
             <div className="form__ok" role="status">
               <h3>Thank you, we've got your request.</h3>
               <p>
-                Our team will call you shortly. For anything urgent, call{" "}
+                We'll call you on <strong>{sentPhone}</strong>{" "}
+                {CALLBACK_PROMISE ? `within ${CALLBACK_PROMISE}` : "shortly"} to
+                arrange your free site assessment. For anything urgent, call{" "}
                 <a href={PHONE.href}>{PHONE.display}</a>.
               </p>
               <button type="button" className="btn btn--ghost" onClick={() => setStatus("idle")}>
@@ -182,23 +257,23 @@ const Contact = ({ chosenService }) => {
           ) : (
             <form ref={formRef} id="quote-form" className="form" onSubmit={onSubmit} noValidate>
               <label className="field">
-                <span>Your name</span>
-                <input name="name" value={data.name} onChange={onChange} autoComplete="name" aria-invalid={!!errors.name} />
-                {errors.name && <span className="form__error">{errors.name}</span>}
-              </label>
-              <label className="field">
                 <span>Phone number</span>
                 <input
                   name="phone"
                   type="tel"
                   inputMode="tel"
-                  placeholder="07XX XXX XXX"
+                  placeholder="0712 345 678 or +254 712 345 678"
                   value={data.phone}
                   onChange={onChange}
                   autoComplete="tel"
-                  aria-invalid={!!errors.phone}
+                  {...errorProps("phone")}
                 />
-                {errors.phone && <span className="form__error">{errors.phone}</span>}
+                {fieldErrorFor("phone")}
+              </label>
+              <label className="field">
+                <span>Your name</span>
+                <input name="name" value={data.name} onChange={onChange} autoComplete="name" {...errorProps("name")} />
+                {fieldErrorFor("name")}
               </label>
               <label className="field">
                 <span>Service you need</span>
@@ -215,8 +290,8 @@ const Contact = ({ chosenService }) => {
               </label>
               <label className="field">
                 <span>Email <em>(optional)</em></span>
-                <input name="email" type="email" value={data.email} onChange={onChange} autoComplete="email" aria-invalid={!!errors.email} />
-                {errors.email && <span className="form__error">{errors.email}</span>}
+                <input name="email" type="email" value={data.email} onChange={onChange} autoComplete="email" {...errorProps("email")} />
+                {fieldErrorFor("email")}
               </label>
               <label className="field">
                 <span>Anything else? <em>(optional)</em></span>
@@ -233,8 +308,29 @@ const Contact = ({ chosenService }) => {
                 {status === "sending" ? "Sending…" : "Request my free assessment"}
               </button>
               {status === "error" && (
-                <p className="form__error" role="alert">{errorText}</p>
+                <div className="form__fallback" role="alert">
+                  <p className="form__error">
+                    {errorText} Your details are ready to send on WhatsApp instead.
+                  </p>
+                  <div className="form__fallback-actions">
+                    <a
+                      href={whatsappLink(whatsappFallbackMessage(data))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--whatsapp"
+                      onClick={() => track("quote_whatsapp_fallback", { service: data.service || "Not sure yet" })}
+                    >
+                      <WhatsAppIcon />
+                      Send this on WhatsApp instead
+                    </a>
+                    <a href={PHONE.href} className="btn btn--ghost" onClick={() => track("call_tap", { from: "quote_error" })}>
+                      <Phone aria-hidden="true" />
+                      Call {PHONE.display}
+                    </a>
+                  </div>
+                </div>
               )}
+              <p className="visually-hidden" aria-live="polite">{announcement}</p>
               <p className="form__note">
                 We use your details only to reply. <a href="/privacy">Privacy notice</a>
               </p>

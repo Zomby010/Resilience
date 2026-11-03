@@ -48,3 +48,37 @@ test("there is a single contact form", () => {
 test("no placeholder reviews are published", () => {
   expect(REVIEWS.filter((r) => r.status === "approved")).toHaveLength(0);
 });
+
+test("if sending fails, offers WhatsApp with the request already filled in", async () => {
+  global.fetch = jest.fn(() => Promise.resolve({ ok: false, status: 503 }));
+  delete process.env.REACT_APP_SERVICE_ID; // no EmailJS fallback either
+  render(<App />);
+  await userEvent.type(screen.getByLabelText(/phone number/i), "0712 345 678");
+  await userEvent.type(screen.getByLabelText(/your name/i), "Jane W.");
+  await userEvent.selectOptions(screen.getByLabelText(/service you need/i), "CCTV Surveillance");
+  await userEvent.type(screen.getByLabelText(/site location/i), "Kisumu");
+  await userEvent.click(screen.getByRole("button", { name: /request my free assessment/i }));
+
+  const link = await screen.findByRole("link", { name: /send this on whatsapp instead/i });
+  const text = decodeURIComponent(link.getAttribute("href").split("text=")[1]);
+  expect(text).toContain("Service: CCTV Surveillance");
+  expect(text).toContain("Name: Jane W.");
+  expect(text).toContain("Phone: 0712 345 678");
+  expect(text).toContain("Site location: Kisumu");
+});
+
+test("a non-Kenyan phone number is flagged when leaving the field", async () => {
+  render(<App />);
+  const phone = screen.getByLabelText(/phone number/i);
+  await userEvent.type(phone, "+44 7911 123456");
+  await userEvent.tab();
+  expect(phone).toHaveAttribute("aria-invalid", "true");
+  expect(phone).toHaveAccessibleDescription(/kenyan mobile number/i);
+});
+
+test("Get a quote moves focus into the form", async () => {
+  render(<App />);
+  await userEvent.click(screen.getByRole("link", { name: /get a quote for cctv surveillance/i }));
+  await new Promise((r) => setTimeout(r, 0));
+  expect(screen.getByLabelText(/phone number/i)).toHaveFocus();
+});
