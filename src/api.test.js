@@ -2,6 +2,8 @@
 // looks in src). They call each handler with a fake request and response.
 const contact = require("../api/contact");
 const health = require("../api/health");
+const review = require("../api/review");
+const reviews = require("../api/reviews");
 
 const fakeRes = () => {
   const res = { headers: {} };
@@ -84,4 +86,78 @@ test("health reports setup as booleans only", () => {
   expect(res.body.resend).toBe(true);
   expect(res.body.bms).toBe(false);
   expect(JSON.stringify(res.body)).not.toContain("re_secret");
+});
+
+describe("reviews and the BMS", () => {
+  const goodReview = { rating: 5, name: "Jane Wanjiru", comment: "Always on time and polite.", email: "j@example.com" };
+  const ok = (body = {}) => Promise.resolve({ ok: true, json: () => Promise.resolve(body), text: () => Promise.resolve("") });
+
+  beforeEach(() => {
+    delete process.env.RESEND_API_KEY;
+    process.env.BMS_API_URL = "https://bms.example.com/";
+    process.env.BMS_API_TOKEN = "tok";
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  test("a review is saved in the BMS even without email set up", async () => {
+    global.fetch = jest.fn(() => ok({ ok: true }));
+    const res = fakeRes();
+    await review(post(goodReview), res);
+    expect(res.statusCode).toBe(200);
+    const [url, options] = global.fetch.mock.calls[0];
+    expect(url).toBe("https://bms.example.com/api/website/reviews/");
+    expect(options.headers.Authorization).toBe("Bearer tok");
+    expect(JSON.parse(options.body)).toEqual({ ...goodReview, location: "", email: "j@example.com" });
+  });
+
+  test("a review is still emailed when the BMS is down", async () => {
+    process.env.RESEND_API_KEY = "re_test";
+    global.fetch = jest.fn((url) =>
+      url.startsWith("https://bms")
+        ? Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve("boom") })
+        : ok()
+    );
+    const res = fakeRes();
+    await review(post(goodReview), res);
+    expect(res.statusCode).toBe(200);
+    expect(global.fetch).toHaveBeenCalledWith("https://api.resend.com/emails", expect.any(Object));
+  });
+
+  test("the visitor is told when neither the BMS nor email took the review", async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve("") }));
+    const res = fakeRes();
+    await review(post(goodReview), res);
+    expect(res.statusCode).toBe(502);
+  });
+
+  test("without the BMS or email the browser is told to fall back (503)", async () => {
+    delete process.env.BMS_API_URL;
+    const res = fakeRes();
+    await review(post(goodReview), res);
+    expect(res.statusCode).toBe(503);
+  });
+
+  test("GET /api/reviews returns the published reviews, cached", async () => {
+    global.fetch = jest.fn(() =>
+      ok({ reviews: [{ id: "bms-3", rating: 4, name: "Jane W.", location: "Kisumu", comment: "Great." }] })
+    );
+    const res = fakeRes();
+    await reviews({ method: "GET" }, res);
+    expect(global.fetch.mock.calls[0][0]).toBe("https://bms.example.com/api/website/reviews/published/");
+    expect(res.body.reviews).toEqual([
+      { id: "bms-3", rating: 4, name: "Jane W.", location: "Kisumu", comment: "Great.", status: "approved" },
+    ]);
+    expect(res.headers["Cache-Control"]).toMatch(/s-maxage=600/);
+  });
+
+  test("GET /api/reviews answers an empty list when the BMS is down or not set up", async () => {
+    global.fetch = jest.fn(() => Promise.reject(new Error("offline")));
+    let res = fakeRes();
+    await reviews({ method: "GET" }, res);
+    expect(res.body).toEqual({ reviews: [] });
+    delete process.env.BMS_API_URL;
+    res = fakeRes();
+    await reviews({ method: "GET" }, res);
+    expect(res.body).toEqual({ reviews: [] });
+  });
 });

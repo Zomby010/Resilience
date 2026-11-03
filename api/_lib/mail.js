@@ -124,15 +124,20 @@ const sendConfirmation = ({ to, phone }) => {
 
 // Wraps a handler with the checks both endpoints share.
 // `what` names the message in logs, e.g. "quote" or "review".
-const handle = (buildMail, what = "message") => async (req, res) => {
+// `store` (optional) also saves the message somewhere else, e.g. the BMS:
+// { enabled: () => boolean, save: async (mail) => void }. The visitor's
+// request succeeds when the email or the store took it.
+const handle = (buildMail, what = "message", store = null) => async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed." });
   }
-  if (!process.env.RESEND_API_KEY) {
-    // Shows in Vercel → Logs. The browser falls back to EmailJS, then WhatsApp.
+  const canEmail = Boolean(process.env.RESEND_API_KEY);
+  const canStore = Boolean(store && store.enabled());
+  if (!canEmail) {
+    // Shows in Vercel → Logs. Without a store, the browser falls back to EmailJS, then WhatsApp.
     console.error(`RESEND_API_KEY missing: ${what} not emailed. See docs/EMAIL-SETUP.md.`);
-    return res.status(503).json({ error: "not_configured" });
+    if (!canStore) return res.status(503).json({ error: "not_configured" });
   }
   const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
   if (body.website) return res.status(200).json({ ok: true }); // honeypot
@@ -148,14 +153,29 @@ const handle = (buildMail, what = "message") => async (req, res) => {
   const mail = buildMail(body);
   if (mail.error) return res.status(400).json({ error: mail.error });
 
-  try {
-    await sendMail(mail);
-  } catch (err) {
-    console.error(err);
+  let stored = false;
+  if (canStore) {
+    try {
+      await store.save(mail);
+      stored = true;
+    } catch (err) {
+      console.error(`Saving the ${what} failed:`, err);
+    }
+  }
+  let emailed = false;
+  if (canEmail) {
+    try {
+      await sendMail(mail);
+      emailed = true;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  if (!stored && !emailed) {
     return res.status(502).json({ error: "We couldn't send that just now. Please call or WhatsApp us." });
   }
 
-  if (mail.confirmation && process.env.SEND_CONFIRMATION === "true") {
+  if (emailed && mail.confirmation && process.env.SEND_CONFIRMATION === "true") {
     // The office already has the request; a failed confirmation is only logged.
     await sendConfirmation(mail.confirmation).catch((err) => console.error("Confirmation email failed:", err));
   }
@@ -163,4 +183,3 @@ const handle = (buildMail, what = "message") => async (req, res) => {
 };
 
 module.exports = { handle, clean, isEmail };
-

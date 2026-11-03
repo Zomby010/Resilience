@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import App from "./App";
 import { REVIEWS } from "./reviewsData";
+import { resetReviewsCache } from "./lib/reviews";
 
 beforeAll(() => {
   window.IntersectionObserver = class {
@@ -81,4 +82,22 @@ test("Get a quote moves focus into the form", async () => {
   await userEvent.click(screen.getByRole("link", { name: /get a quote for cctv surveillance/i }));
   await new Promise((r) => setTimeout(r, 0));
   expect(screen.getByLabelText(/phone number/i)).toHaveFocus();
+});
+
+test("shows reviews the office published in the BMS", async () => {
+  resetReviewsCache();
+  global.fetch = jest.fn((url) =>
+    url === "/api/reviews"
+      ? Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              reviews: [{ id: "bms-1", rating: 5, name: "Jane W.", location: "Kisumu", comment: "Always on time.", status: "approved" }],
+            }),
+        })
+      : Promise.resolve({ ok: false, status: 404 })
+  );
+  render(<App />);
+  expect(await screen.findAllByText(/always on time/i)).not.toHaveLength(0);
+  resetReviewsCache();
 });

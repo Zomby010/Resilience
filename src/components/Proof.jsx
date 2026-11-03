@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Building2, Church, GraduationCap, Hotel, Hospital, Star, Store } from "lucide-react";
 
 import { GALLERY } from "../galleryData";
-import { REVIEWS } from "../reviewsData";
+import { useReviews } from "../lib/reviews";
 import { GOOGLE_REVIEWS_URL } from "../siteConfig";
 import ReviewDialog from "./ReviewDialog";
 
@@ -27,7 +27,7 @@ const Stars = ({ value }) => (
 
 const Proof = () => {
   const [showAll, setShowAll] = useState(false);
-  const reviews = useMemo(() => REVIEWS.filter((r) => r.status === "approved"), []);
+  const reviews = useReviews();
   const photos = showAll ? GALLERY : GALLERY.slice(0, FIRST_PHOTOS);
 
   return (

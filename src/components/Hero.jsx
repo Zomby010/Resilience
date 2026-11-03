@@ -2,16 +2,15 @@ import React from "react";
 import { ArrowRight, MapPin, ShieldCheck } from "lucide-react";
 
 import { COMPANY, GENERAL_WHATSAPP_MESSAGE, STATS, TRUST, whatsappLink } from "../siteConfig";
-import { REVIEWS } from "../reviewsData";
+import { useReviews } from "../lib/reviews";
 import { track } from "../lib/analytics";
 import WhatsAppIcon from "./WhatsAppIcon";
-
-const TESTIMONIALS = REVIEWS.filter((r) => r.status === "approved").slice(0, 3);
 
 // Evidence under the trust numbers: licence number, client logos and short
 // testimonials. Each part shows only once the owner has added real details.
 const TrustEvidence = () => {
-  if (!TRUST.clientLogos.length && !TESTIMONIALS.length) return null;
+  const testimonials = useReviews().slice(0, 3);
+  if (!TRUST.clientLogos.length && !testimonials.length) return null;
   return (
     <div className="evidence">
       {TRUST.clientLogos.length > 0 && (
@@ -23,9 +22,9 @@ const TrustEvidence = () => {
           ))}
         </ul>
       )}
-      {TESTIMONIALS.length > 0 && (
+      {testimonials.length > 0 && (
         <ul className="evidence__quotes" aria-label="What clients say">
-          {TESTIMONIALS.map((t) => (
+          {testimonials.map((t) => (
             <li key={t.id}>
               <blockquote>“{t.comment}”</blockquote>
               <p>
